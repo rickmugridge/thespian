@@ -1,0 +1,22 @@
+{
+  "name": "tsDiffMockery",
+  "version": "2.0.0",
+  "main": "js/main/index.js",
+  "engines": {
+    "node": ">=10.13.0"
+  },
+  "scripts": {
+    "clean": "rimraf dist/**",
+    "compile": "tsc -p .",
+    "test:micro": "npm run clean && npm run compile && npm run retest:micro",
+    "retest:micro": "mocha --exit \"./dist/src/**/*.micro.js\""
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.3",
+    "@types/node": "~9.4.6",
+    "mocha": "^5.2.0",
+    "rimraf": "^2.6.2",
+    "ts-node": "^6.2.0",
+    "typescript": "3.5.2"
+  }
+}
