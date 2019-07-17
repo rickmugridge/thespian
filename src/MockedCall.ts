@@ -31,7 +31,7 @@ export class MockedCall<U> {
                 return Optional.none;
             }
         }
-        try {
+        try { // todo consider passing actualArgs to returnFn()
             const result = this.returnFn ? this.returnFn() : undefined; // todo Consider whether this is the best approach
             this.successfulCalls.push(new SuccessfulCall(this.methodName, actualArgs, result));
             this.actualTimes += 1;

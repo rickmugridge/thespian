@@ -15,3 +15,16 @@ export class Optional<T> {
         return new Optional(true, value);
     }
 }
+
+/*
+
+Note can do Scala-like matching with these. Eg
+
+   const v: Optional = ...
+   switch (v.isSome) {
+      case true:... // todo consider constants Some and None for true and false
+      case false:...
+   }
+
+
+ */

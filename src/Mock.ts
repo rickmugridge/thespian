@@ -1,9 +1,10 @@
 import {MockedCall} from "./MockedCall";
+import {MockHandler} from "./MockHandler";
 
 let args;
 
 export class Mock<T> { // One for each mocked object and function
-    handler = new Handler();
+    handler = new MockHandler();
     object = new Proxy({f: (() => 3)}, this.handler);
 
     constructor(public name: string | undefined) {
@@ -31,49 +32,10 @@ export class Mock<T> { // One for each mocked object and function
     }
 
     verify() {
-        // todo Check that all expectation were met - providing details of what didn't happen, etc
+        this.handler.verify();
     }
 }
 
-class Handler implements ProxyHandler<{}> {
-    map = new Map<string, any>();
-    mapMethodToMockCalls = new Map<string | undefined, Array<MockedCall<any>>>();
-
-    add(mockCall: MockedCall<any>) {
-        const mockCalls = this.mapMethodToMockCalls.get(mockCall.methodName);
-        if (!mockCalls) {
-            this.mapMethodToMockCalls.set(mockCall.methodName, [mockCall]);
-        } else {
-            mockCalls.push(mockCall);
-        }
-    }
-
-    get(target, propKey: string, receiver) {
-        console.debug("get", {propKey}); // todo Remove
-        const result = this.map.get(propKey);
-        if (result) {
-            return result;
-        }
-        if (propKey === "foo") {
-            return 556;
-        }
-        if (propKey === "f") {
-            return i => i + 333;
-        }
-        return 22;
-    }
-
-    // Called by apply() and call().
-    apply(target, thisArg, argumentsList) {
-        console.debug("apply", {thisArg, argumentsList}); // todo Remove
-
-        return 234; //target(argumentsList[0], argumentsList[1]) * 10;
-    }
-
-    setup(name: string, result: any) {
-        this.map.set(name, result);
-    }
-}
 
 function spy() {
     args = Array.from(arguments);
@@ -81,7 +43,7 @@ function spy() {
 
 // Return a string if it's a method call, or undefined if it's a function call
 // todo Allow for 'f => f.property'
-function methodName<T, U>(f: (t: T) => U): string | undefined {
+function methodName<T, U>(f: (t: T) => U): string | undefined { // todo Use Optional here
     const fn = f.toString(); // 'f => f.foooo(2, "aaa")'
     const split = fn.split(" => "); // ['f', 'f.foooo(2, "aaa")'
     const call = split[1]; // 'f.foooo(2, "aaa")'
@@ -89,7 +51,7 @@ function methodName<T, U>(f: (t: T) => U): string | undefined {
     if (dot < 0) {
         return undefined; // a function
     }
-    const openBracket = call.indexOf("("); /// todo may not exist
+    const openBracket = call.indexOf("("); /// todo may not exist, with a property
     const fnName = call.slice(dot + 1, openBracket);
     return fnName;
 }

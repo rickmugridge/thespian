@@ -29,15 +29,18 @@ describe("MockedCall()", () => {
             expect(mockedCall.times(0), mockedCall);
             expect(mockedCall.didRun([1]).isSome, false);
         });
+
         it("Fails as args don't match due to length difference", () => {
             const mockedCall = new MockedCall("m", [1]);
             expect(mockedCall.didRun([]).isSome, false);
         });
+
         it("Fails as args don't match due to args difference", () => {
             const mockedCall = new MockedCall("m", [1]);
             expect(mockedCall.didRun([2]).isSome, false);
         });
-        it("Fails as args don't match due to args difference", () => {
+
+        it("Suceeds on first call but not second", () => {
             const mockedCall = new MockedCall("m", [1]);
             mockedCall.returns(f);
             expect(mockedCall.didRun([1]).isSome, true);
