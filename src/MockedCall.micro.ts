@@ -1,5 +1,5 @@
 import {MockedCall} from "./MockedCall";
-import {expect} from "./Mockery.micro";
+import {expect} from "./Mock.micro";
 
 describe("MockedCall()", () => {
     it("initially", () => {
@@ -23,24 +23,26 @@ describe("MockedCall()", () => {
         expect(mockedCall.actualTimes, 0);
     });
 
-    describe("didRun()",()=>{
+    describe("didRun()", () => {
         it("Fails as actualTimes === expectedTimes", () => {
             const mockedCall = new MockedCall("m", [1]);
             expect(mockedCall.times(0), mockedCall);
-            expect(mockedCall.didRun([1]), false);
+            expect(mockedCall.didRun([1]).isSome, false);
         });
         it("Fails as args don't match due to length difference", () => {
             const mockedCall = new MockedCall("m", [1]);
-            expect(mockedCall.didRun([]), false);
+            expect(mockedCall.didRun([]).isSome, false);
         });
         it("Fails as args don't match due to args difference", () => {
             const mockedCall = new MockedCall("m", [1]);
-            expect(mockedCall.didRun([2]), false);
+            expect(mockedCall.didRun([2]).isSome, false);
         });
         it("Fails as args don't match due to args difference", () => {
             const mockedCall = new MockedCall("m", [1]);
-            expect(mockedCall.didRun([1]), true);
-            expect(mockedCall.didRun([1]), false); // as only 1 times
+            mockedCall.returns(f);
+            expect(mockedCall.didRun([1]).isSome, true);
+            expect(mockedCall.didRun([1]).isSome, false); // as only 1 times
+            console.debug({successfulCalls: JSON.stringify(mockedCall.successfulCalls)}); // todo Turn into a test with DiffMatch
         });
     });
 });

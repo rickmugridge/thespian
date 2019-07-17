@@ -1,8 +1,11 @@
 // Attached to a Handler - one for each possible call:
+import {Optional} from "./Optional";
+
 export class MockedCall<U> {
     expectedTimes = 1;
     actualTimes = 0;
-    returnFn: () => {};
+    returnFn: () => U;
+    successfulCalls: Array<SuccessfulCall> = [];
 
     // todo Need to also record the specifics of each matched call to a MockedCall, where times > 1
 
@@ -19,34 +22,28 @@ export class MockedCall<U> {
         return this;
     }
 
-    didRun(actualArgs: Array<any>): boolean {
+    didRun(actualArgs: Array<any>): Optional<any> {
         if (this.actualTimes >= this.expectedTimes || actualArgs.length != this.expectedArgs.length) {
-            return false;
+            return Optional.none;
         }
         for (let i = 0; i < actualArgs.length; i++) {
             if (actualArgs[i] !== this.expectedArgs[i]) { // todo use DiffMatcher's here instead
-                return false;
+                return Optional.none;
             }
         }
-        this.actualTimes += 1;
-        return true;
+        try {
+            const result = this.returnFn ? this.returnFn() : undefined; // todo Consider whether this is the best approach
+            this.successfulCalls.push(new SuccessfulCall(this.methodName, actualArgs, result));
+            this.actualTimes += 1;
+            return Optional.some(result);
+        } catch (e) {
+            console.debug("Problem", {e}); // todo Improve message
+        }
+        return Optional.none;
     }
 }
 
 class SuccessfulCall {
     constructor(public methodName: string | undefined, public actualArgs: Array<any>, public returnValue: any) {
-    }
-}
-
-class Option {
-    constructor(public isSome: boolean, public some?: any) {
-    }
-
-    static none() {
-        return new Option(false);
-    }
-
-    static some(value: any) {
-        return new Option(true, value);
     }
 }
