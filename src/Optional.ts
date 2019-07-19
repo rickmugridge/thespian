@@ -9,7 +9,7 @@ export class Optional<T> {
         return this;
     }
 
-    static none = new Optional(false);
+    static none = new Optional<any>(false);
 
     static some<T>(value: T) {
         return new Optional(true, value);

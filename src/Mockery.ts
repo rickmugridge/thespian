@@ -9,7 +9,12 @@ export class Mockery {
         return mock;
     }
 
-    verifyAll() {
+    verify() {
         this.mocks.forEach(m => m.verify());
+    }
+
+    describeMocks() {
+        const describe = JSON.stringify(this.mocks.map(m => m.describeMocks()));
+        console.debug("\n", {describe: describe}); // todo Remove
     }
 }

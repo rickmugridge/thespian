@@ -1,7 +1,7 @@
 // Attached to a Handler - one for each possible call:
 import {Optional} from "./Optional";
 
-export class MockedCall<U> {
+export class MockedCall<U> {// where U is the return type
     expectedTimes = 1;
     actualTimes = 0;
     returnFn: () => U;
@@ -23,6 +23,7 @@ export class MockedCall<U> {
     }
 
     didRun(actualArgs: Array<any>): Optional<any> {
+        // console.debug("didRun", {methodName: this.methodName, actualArgs}); // todo Remove
         if (this.actualTimes >= this.expectedTimes || actualArgs.length != this.expectedArgs.length) {
             return Optional.none;
         }
@@ -41,9 +42,25 @@ export class MockedCall<U> {
         }
         return Optional.none;
     }
+
+    describe() {
+        return {
+            methodName: this.methodName,
+            expectedArgs: this.expectedArgs,
+            timesRemaining: this.expectedTimes - this.actualTimes,
+            successfulCalls: this.successfulCalls.map(c => c.describe())
+        };
+    }
 }
 
 class SuccessfulCall {
     constructor(public methodName: string | undefined, public actualArgs: Array<any>, public returnValue: any) {
+    }
+
+    describe() {
+        return {
+            actualArgs: this.actualArgs,
+            returnValue: this.returnValue
+        };
     }
 }

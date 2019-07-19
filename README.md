@@ -30,4 +30,5 @@ It follows some of structure of TypeMoq, but little of the philosophy
  - Provide full documentation here.
  - Make it easy to turn on helpful tracing of mock selections and calls. 
    It can be painful when it's unclear why a mock failed.
+ - consider what other Proxy methods are needed: apply() etc
  - ...
