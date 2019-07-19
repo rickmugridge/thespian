@@ -50,15 +50,15 @@ describe("Mock()", () => {
         });
     });
 
-    describe("object has",()=>{
-        // it("??", () => {
-        //     const mockery = new Mockery();
-        //     const mock = mockery.mock<I>("an object");
-        //     mock
-        //         .setup(f => f.foo(2, "aaa"))
-        //         .returns(() => 44);
-        //     assertThat(mock.object.foo(2, "aaa"), 44);
-        // });
+    describe("property in object: has",()=>{
+        it("has", () => {
+            const mockery = new Mockery();
+            const mock = mockery.mock<I>("an object");
+            mock
+                .setup(f => f.foo(2, "aaa"))
+                .returns(() => 44);
+            assertThat("foo" in mock.object, true);
+        });
     });
 
     describe("function", () => {
