@@ -1,6 +1,5 @@
 import {MockedCall} from "./MockedCall";
 import {isSymbol} from "util";
-import {Runtime} from "inspector";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<string | number | symbol | undefined, Array<MockedCall<any>>>();

@@ -15,7 +15,7 @@ describe('MockHandler()', () => {
             const mockedCall = new MockedCall<any>("method", [1]);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "method", undefined);
-            assertThat(fn(1), undefined);
+            assertThat(fn(1)).is(undefined);
         });
 
         it("Call known method with a single MockedCall, with specified result", () => {
@@ -24,7 +24,7 @@ describe('MockHandler()', () => {
             mockedCall.returns(() => 456);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "method", undefined);
-            assertThat(fn(1), 456);
+            assertThat(fn(1)).is(456);
         });
 
         it("Call known method with a single MockedCall, but doesn't match", () => {
@@ -45,8 +45,8 @@ describe('MockHandler()', () => {
             mockedCall2.returns(() => 789);
             handler.add(mockedCall2);
             const fn = handler.get(undefined, "method", undefined);
-            assertThat(fn(1, 2), 456);
-            assertThat(fn(2, 3), 789);
+            assertThat(fn(1, 2)).is(456);
+            assertThat(fn(2, 3)).is(789);
         });
     });
 
@@ -56,7 +56,7 @@ describe('MockHandler()', () => {
             const mockedCall = new MockedCall<any>("", [1]);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "", undefined);
-            assertThat(fn(1), undefined);
+            assertThat(fn(1)).is(undefined);
         });
 
         it("Call known function with a single MockedCall, with specified result", () => {
@@ -65,8 +65,7 @@ describe('MockHandler()', () => {
             mockedCall.returns(() => 456);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "", undefined);
-            assertThat(fn(1), 456);
+            assertThat(fn(1)).is(456);
         });
     });
-
 });
