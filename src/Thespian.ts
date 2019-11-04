@@ -1,6 +1,6 @@
 import {Mock} from "./Mock";
 
-export class Mockery {
+export class Thespian {
     mocks: Array<Mock<any>> = []; // One for each Mocked object or function
 
     mock<T>(name?: string) {

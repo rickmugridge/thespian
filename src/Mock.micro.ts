@@ -1,10 +1,10 @@
-import {Mockery} from "./Mockery";
+import {Thespian} from "./Thespian";
 import {assertThat} from "./assertThat";
 
 describe("Mock()", () => {
     describe("object", () => {
         it("method called once", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<I>("an object");
             mock
                 .setup(f => f.foo(2, "aaa"))
@@ -13,7 +13,7 @@ describe("Mock()", () => {
         });
 
         it("a method called twice with same arguments and same result", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<I>("an object");
             mock
                 .setup(f => f.foo(2, "aaa"))
@@ -24,7 +24,7 @@ describe("Mock()", () => {
         });
 
         it("a method called twice with same arguments", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<I>("an object");
             mock
                 .setup(f => f.foo(2, "aaa"))
@@ -37,7 +37,7 @@ describe("Mock()", () => {
         });
 
         it("a method called twice with different arguments", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<I>("an object");
             mock
                 .setup(f => f.foo(2, "aaa"))
@@ -52,7 +52,7 @@ describe("Mock()", () => {
 
     describe("property in object: has",()=>{
         it("has", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<I>("an object");
             mock
                 .setup(f => f.foo(2, "aaa"))
@@ -63,7 +63,7 @@ describe("Mock()", () => {
 
     describe("function", () => {
         it("function called once", () => {
-            let mockery = new Mockery();
+            let mockery = new Thespian();
             let mock = mockery.mock<(i: number) => number>("fn");
             mock
                 .setup(g => g(2))
@@ -74,7 +74,7 @@ describe("Mock()", () => {
         });
 
         it("function called twice with same arguments and same result", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<(i: number) => number>("fn");
             mock
                 .setup(g => g(2))
@@ -88,7 +88,7 @@ describe("Mock()", () => {
         });
 
         it("function called twice with same arguments and different result", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<(i: number) => number>("fn");
             mock
                 .setup(g => g(2))
@@ -101,7 +101,7 @@ describe("Mock()", () => {
         });
 
         it("function called twice with different arguments", () => {
-            const mockery = new Mockery();
+            const mockery = new Thespian();
             const mock = mockery.mock<(i: number) => number>("fn");
             mock
                 .setup(g => g(2))

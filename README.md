@@ -1,6 +1,8 @@
-# tsDiffMockery
+# thespian
 
 A mocking framework in Typescript that respects types in mocks.
+
+Thespians are like mocks - they play a role.
 
 It follows the philosophy of `JMock2` in Java:
  - It is intended to mock interfaces (or classes)
@@ -8,8 +10,8 @@ It follows the philosophy of `JMock2` in Java:
  - Mocks are identified, so it's easier to understand error messages when multiple mocks are involved
  - Expectations are set up before running the system under test
  - A test fails immediately if a call fails to match a mock - it doesn't return undefined by default!
- - A Mockery object creates all mocks for a test. 
-   The Mockery is responsible for verification of expected calls across all mocks at once (not individually, like with TypeMoq)
+ - A Thespian object creates all mocks for a test. 
+   The Thespian is responsible for verification of expected calls across all mocks at once (not individually, like with TypeMoq)
  - For matching arguments, it uses a matcher that has many of the properties of hamcrest: `tsDiffMatcher` (name in progress).
    This allows for sophisticated matching of arguments, unlike in most mocking frameworks
  - When a mock fails, it displays what mocks have just passed and shows how the call failed to match the "best" mock-call (if any)
