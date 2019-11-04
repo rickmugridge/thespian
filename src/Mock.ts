@@ -1,8 +1,9 @@
 import {MockedCall} from "./MockedCall";
 import {MockHandler} from "./MockHandler";
 import {Optional} from "./Optional";
+import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 
-let args;
+let expectedArgs;
 
 export class Mock<T> { // One for each mocked object and function
     handler = new MockHandler();
@@ -26,7 +27,7 @@ export class Mock<T> { // One for each mocked object and function
             f(spy as any as T);
             // console.debug("setup", {name: this.name, args: JSON.stringify(args)}); // todo Remove
         }
-        const mockCall = new MockedCall<U>(fieldName, args);
+        const mockCall = new MockedCall<U>(fieldName, expectedArgs.map(matchMaker));
         // console.debug("setup", {mockCall}); // todo Remove
         this.handler.add(mockCall);
         return mockCall;
@@ -43,7 +44,7 @@ export class Mock<T> { // One for each mocked object and function
 
 
 function spy() {
-    args = Array.from(arguments);
+    expectedArgs = Array.from(arguments);
 }
 
 // Return a string if it's a method call, or undefined if it's a function call

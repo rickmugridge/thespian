@@ -1,5 +1,6 @@
 // Attached to a Handler - one for each possible call:
 import {Optional} from "./Optional";
+import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
 
 export class MockedCall<U> {// where U is the return type
     expectedTimes = 1;
@@ -9,15 +10,15 @@ export class MockedCall<U> {// where U is the return type
 
     // todo Need to also record the specifics of each matched call to a MockedCall, where times > 1
 
-    constructor(public methodName: string | undefined, private expectedArgs: Array<any>) {
+    constructor(public methodName: string | undefined, private expectedArgs: Array<DiffMatcher<any>>) {
     }
 
-    returns(f: () => U): MockedCall<U> {
+    returns(f: () => U): this {
         this.returnFn = f;
         return this;
     }
 
-    times(count: number): MockedCall<U> {
+    times(count: number): this {
         this.expectedTimes = count; // Later allow for a DiffMatcher
         return this;
     }
@@ -28,7 +29,7 @@ export class MockedCall<U> {// where U is the return type
             return Optional.none;
         }
         for (let i = 0; i < actualArgs.length; i++) {
-            if (actualArgs[i] !== this.expectedArgs[i]) { // todo use DiffMatcher's here instead
+            if (!this.expectedArgs[i].matches(actualArgs[i]).passed()) {
                 return Optional.none;
             }
         }
