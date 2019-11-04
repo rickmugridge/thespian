@@ -1,18 +1,3 @@
-export function assertThat(actual: any) {
-    return new Assertion(actual);
-}
-
-class Assertion<T> {
-    constructor(private actual: any) {
-    }
-
-    is(expected: any) {
-        if (this.actual != expected) {
-            throw new Error(`actual was ${this.actual} but expected ${expected}`);
-        }
-    }
-}
-
 export function expectThrow(actual: () => any) {
     let unexpected = false;
     try {

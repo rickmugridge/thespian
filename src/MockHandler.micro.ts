@@ -1,6 +1,7 @@
 import {MockHandler} from "./MockHandler";
 import {MockedCall} from "./MockedCall";
-import {assertThat, expectThrow} from "./assertThat";
+import {expectThrow} from "./assertThat";
+import {assertThat} from "mismatched/dist/src/assertThat";
 
 describe('MockHandler()', () => {
     it("Call on an unknown method", () => {

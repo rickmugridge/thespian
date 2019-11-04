@@ -1,5 +1,5 @@
 import {Thespian} from "./Thespian";
-import {assertThat} from "./assertThat";
+import {assertThat} from "mismatched/dist/src/assertThat";
 
 describe("Mock()", () => {
     describe("object", () => {

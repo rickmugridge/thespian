@@ -1,5 +1,5 @@
 import {Optional} from "./Optional";
-import {assertThat} from "./assertThat";
+import {assertThat} from "mismatched/dist/src/assertThat";
 
 describe("Option()", () => {
     it("Option.none is not isSome", () => {

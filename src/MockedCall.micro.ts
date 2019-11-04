@@ -1,5 +1,5 @@
 import {MockedCall} from "./MockedCall";
-import {assertThat} from "./assertThat";
+import {assertThat} from "mismatched/dist/src/assertThat";
 
 describe("MockedCall()", () => {
     it("initially", () => {
