@@ -14,7 +14,7 @@ export class MockedCall<U> {// where U is the return type
 
     // todo Need to also record the specifics of each matched call to a MockedCall, where times > 1
 
-    constructor(public methodName: string | undefined, expectedArguments: Array<any>) {
+    constructor(public mockName: string, public methodName: string | undefined, expectedArguments: Array<any>) {
         this.expectedArgs = match.array.match(expectedArguments);
     }
 
@@ -43,7 +43,7 @@ export class MockedCall<U> {// where U is the return type
 
     didRun(actualArgs: Array<any>): Optional<any> {
         if (!this.returnFn) {
-            throw new Error(`A returns() function is needed for mock for "${this.methodName}()"`);
+            throw new Error(`A returns() function is needed for mock for "${this.mockName}.${this.methodName}()"`);
         }
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         if (timesIncorrect) {
@@ -69,7 +69,7 @@ export class MockedCall<U> {// where U is the return type
 
     describe() {
         return {
-            methodName: this.methodName,
+            methodName: this.mockName + "." + this.methodName,
             expectedArgs: this.expectedArgs.describe(),
             expectedTimes: this.expectedTimes.describe(),
             timesCovered: this.expectedTimes.matches(this.actualTimes).passed(),

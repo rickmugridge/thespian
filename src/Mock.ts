@@ -22,13 +22,10 @@ export class Mock<T> { // One for each mocked object and function
                 [fieldName]: spy
             } as any as T;
             f(t);
-            // console.debug("setup", {name: this.name, fieldName, args: JSON.stringify(args)}); // todo Remove
         } else {
             f(spy as any as T);
-            // console.debug("setup", {name: this.name, args: JSON.stringify(args)}); // todo Remove
         }
-        const mockCall = new MockedCall<U>(fieldName, expectedArgs.map(matchMaker));
-        // console.debug("setup", {mockCall}); // todo Remove
+        const mockCall = new MockedCall<U>(this.name || "", fieldName, expectedArgs.map(matchMaker));
         this.handler.add(mockCall);
         return mockCall;
     }

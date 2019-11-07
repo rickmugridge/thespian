@@ -13,7 +13,7 @@ describe('MockHandler()', () => {
     describe('method:', () => {
         it("Call known method with a single MockedCall, with undefined result", () => {
             const handler = new MockHandler();
-            const mockedCall = new MockedCall<any>("method", [match.any()])
+            const mockedCall = new MockedCall<any>("thespian","method", [match.any()])
                 .returns(a => a);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "method", undefined);
@@ -22,7 +22,7 @@ describe('MockHandler()', () => {
 
         it("Call known method with a single MockedCall, with specified result", () => {
             const handler = new MockHandler();
-            const mockedCall = new MockedCall<any>("method", [1]);
+            const mockedCall = new MockedCall<any>("thespian","method", [1]);
             mockedCall.returns(() => 456);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "method", undefined);
@@ -31,7 +31,7 @@ describe('MockHandler()', () => {
 
         it("Call known method with a single MockedCall, but doesn't match", () => {
             const handler = new MockHandler();
-            const mockedCall = new MockedCall<any>("method", [1]);
+            const mockedCall = new MockedCall<any>("thespian","method", [1]);
             mockedCall.returns(() => 456);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "method", undefined);
@@ -40,10 +40,10 @@ describe('MockHandler()', () => {
 
         it("Call known method with a 2 MockedCall2, with one matching", () => {
             const handler = new MockHandler();
-            const mockedCall1 = new MockedCall<any>("method", [1, 2]);
+            const mockedCall1 = new MockedCall<any>("thespian","method", [1, 2]);
             mockedCall1.returns(() => 456);
             handler.add(mockedCall1);
-            const mockedCall2 = new MockedCall<any>("method", [2, 3]);
+            const mockedCall2 = new MockedCall<any>("thespian","method", [2, 3]);
             mockedCall2.returns(() => 789);
             handler.add(mockedCall2);
             const fn = handler.get(undefined, "method", undefined);
@@ -55,7 +55,7 @@ describe('MockHandler()', () => {
     describe('function:', () => {
         it("Call known function with a single MockedCall, with undefined result", () => {
             const handler = new MockHandler();
-            const mockedCall = new MockedCall<any>("", [1])
+            const mockedCall = new MockedCall<any>("thespian","", [1])
                 .returns(()=> 5);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "", undefined);
@@ -64,7 +64,7 @@ describe('MockHandler()', () => {
 
         it("Call known function with a single MockedCall, with specified result", () => {
             const handler = new MockHandler();
-            const mockedCall = new MockedCall<any>("", [1]);
+            const mockedCall = new MockedCall<any>("thespian","", [1]);
             mockedCall.returns(() => 456);
             handler.add(mockedCall);
             const fn = handler.get(undefined, "", undefined);
