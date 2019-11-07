@@ -7,7 +7,7 @@ describe("Mock()", () => {
             const mockery = new Thespian();
             const mock = mockery.mock<I>("an object");
             mock
-                .setup(f => f.foo(2, match.ofType.string() as any))
+                .setup(f => f.foo(2, match.ofType.string()))
                 .returns(() => 44);
             assertThat(mock.object.foo(2, "aaa")).is(44);
         });

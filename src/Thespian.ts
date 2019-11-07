@@ -1,4 +1,5 @@
 import {Mock} from "./Mock";
+import {PrettyPrinter} from "mismatched";
 
 export class Thespian {
     mocks: Array<Mock<any>> = []; // One for each Mocked object or function
@@ -14,7 +15,7 @@ export class Thespian {
     }
 
     describeMocks() {
-        const describe = JSON.stringify(this.mocks.map(m => m.describeMocks()));
-        console.debug("\n", {describe: describe}); // todo Remove
+        const describe = PrettyPrinter.make().render(this.mocks.map(m => m.describeMocks()));
+        console.log("\n", {describe: describe});
     }
 }

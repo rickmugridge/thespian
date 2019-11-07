@@ -50,9 +50,9 @@ function spy() {
 // Return a string if it's a method call, or undefined if it's a function call
 // todo Allow for 'f => f.property'
 function methodName<T, U>(f: (t: T) => U): Optional<string> {
-    const fn = f.toString(); // 'f => f.foooo(2, "aaa")'
-    const split = fn.split(" => "); // ['f', 'f.foooo(2, "aaa")'
-    const call = split[1]; // 'f.foooo(2, "aaa")'
+    const fn = f.toString(); // Eg, 'f => f.foooo(2, "aaa")'
+    const split = fn.split(" => "); // Eg, ['f', 'f.foooo(2, "aaa")'
+    const call = split[1]; // eg, 'f.foooo(2, "aaa")'
     const dot = call.indexOf(".");
     if (dot < 0) {
         return Optional.none; // a function

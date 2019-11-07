@@ -1,40 +1,59 @@
-// Attached to a Handler - one for each possible call:
 import {Optional} from "./Optional";
 import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
+import {match} from "mismatched";
+import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 
+// Attached to a Handler - one for each possible call:
 export class MockedCall<U> {// where U is the return type
-    expectedTimes = 1;
-    actualTimes = 0;
-    returnFn: () => U;
-    successfulCalls: Array<SuccessfulCall> = [];
+    private expectedArgs: DiffMatcher<any>;
+    private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;
+    private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
+    private actualTimes = 0;
+    private returnFn: (...args: Array<any>) => U;
+    private successfulCalls: Array<SuccessfulCall> = [];
 
     // todo Need to also record the specifics of each matched call to a MockedCall, where times > 1
 
-    constructor(public methodName: string | undefined, private expectedArgs: Array<DiffMatcher<any>>) {
+    constructor(public methodName: string | undefined, expectedArguments: Array<any>) {
+        this.expectedArgs = match.array.match(expectedArguments);
     }
 
-    returns(f: () => U): this {
+    returns(f: (...args: Array<any>) => U): this {
         this.returnFn = f;
         return this;
     }
 
     times(count: number): this {
-        this.expectedTimes = count; // Later allow for a DiffMatcher
+        this.expectedTimes = matchMaker(count);
+        this.expectedTimesInProgress = match.number.lessEqual(count);
+        return this;
+    }
+
+    timesAtLeast(count: number): this {
+        this.expectedTimes = match.number.greaterEqual(count);
+        this.expectedTimesInProgress = match.number.greaterEqual(count);
+        return this;
+    }
+
+    timesAtMost(count: number): this {
+        this.expectedTimes = match.number.lessEqual(count);
+        this.expectedTimesInProgress = match.number.lessEqual(count);
         return this;
     }
 
     didRun(actualArgs: Array<any>): Optional<any> {
-        // console.debug("didRun", {methodName: this.methodName, actualArgs}); // todo Remove
-        if (this.actualTimes >= this.expectedTimes || actualArgs.length != this.expectedArgs.length) {
+        if (!this.returnFn) {
+            throw new Error(`A returns() function is needed for mock for "${this.methodName}()"`);
+        }
+        const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
+        if (timesIncorrect) {
             return Optional.none;
         }
-        for (let i = 0; i < actualArgs.length; i++) {
-            if (!this.expectedArgs[i].matches(actualArgs[i]).passed()) {
-                return Optional.none;
-            }
+        if (!this.expectedArgs.matches(actualArgs).passed()) {
+            return Optional.none;
         }
-        try { // todo consider passing actualArgs to returnFn()
-            const result = this.returnFn ? this.returnFn() : undefined; // todo Consider whether this is the best approach
+        try {
+            const result = this.returnFn.apply(undefined, actualArgs);
             this.successfulCalls.push(new SuccessfulCall(this.methodName, actualArgs, result));
             this.actualTimes += 1;
             return Optional.some(result);
@@ -44,11 +63,16 @@ export class MockedCall<U> {// where U is the return type
         return Optional.none;
     }
 
+    hasRun(): boolean {
+        return this.actualTimes > 0;
+    }
+
     describe() {
         return {
             methodName: this.methodName,
-            expectedArgs: this.expectedArgs,
-            timesRemaining: this.expectedTimes - this.actualTimes,
+            expectedArgs: this.expectedArgs.describe(),
+            expectedTimes: this.expectedTimes.describe(),
+            timesCovered: this.expectedTimes.matches(this.actualTimes).passed(),
             successfulCalls: this.successfulCalls.map(c => c.describe())
         };
     }

@@ -1,5 +1,8 @@
 import {MockedCall} from "./MockedCall";
 import {isSymbol} from "util";
+import {PrettyPrinter} from "mismatched";
+
+const printer = PrettyPrinter.make();
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<string | number | symbol | undefined, Array<MockedCall<any>>>();
@@ -29,7 +32,7 @@ export class MockHandler implements ProxyHandler<{}> {
                     return did.some;
                 }
             }
-            throw new Error(`Unable to call ${propKey as string}(${actualArguments.join(",")}) as it does not match`);
+            throw new Error(`Unable to call ${propKey as string}(${printer.render(actualArguments)}) as it does not match`);
         }
 
         if (mockCalls) {
@@ -52,7 +55,8 @@ export class MockHandler implements ProxyHandler<{}> {
                 return did.some;
             }
         }
-        throw new Error(`Unable to call (${actualArguments.join(",")}), as it does not match`);
+        console.log(printer.render(this.describeMocks()));
+        throw new Error(`Unable to call (${printer.render(actualArguments)}), as it does not match`);
     }
 
     has(target, propKey: string): boolean {
@@ -80,11 +84,10 @@ export class MockHandler implements ProxyHandler<{}> {
     describeMocks() {
         const result: Array<any> = [];
         this.mapMethodToMockCalls.forEach(mockCalls =>
-            mockCalls.forEach(m => result.push(m.describe()))
+            mockCalls.filter(m => m.hasRun()).forEach(m => result.push(m.describe()))
         );
         return result;
     }
 
     static applyKey = "";
-
 }
