@@ -10,11 +10,13 @@ export class MockedCall<U> {// where U is the return type
     private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
     private actualTimes = 0;
     private returnFn: (...args: Array<any>) => U;
-    private successfulCalls: Array<SuccessfulCall> = [];
 
     // todo Need to also record the specifics of each matched call to a MockedCall, where times > 1
 
-    constructor(public mockName: string, public methodName: string | undefined, expectedArguments: Array<any>) {
+    constructor(public fullName: string,
+                public methodName: string,
+                expectedArguments: Array<any>,
+                private successfulCalls: Array<SuccessfulCall>) {
         this.expectedArgs = match.array.match(expectedArguments);
     }
 
@@ -43,7 +45,7 @@ export class MockedCall<U> {// where U is the return type
 
     didRun(actualArgs: Array<any>): Optional<any> {
         if (!this.returnFn) {
-            throw new Error(`A returns() function is needed for mock for "${this.mockName}.${this.methodName}()"`);
+            throw new Error(`A returns() function is needed for mock for "${this.fullName}()"`);
         }
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         if (timesIncorrect) {
@@ -54,8 +56,9 @@ export class MockedCall<U> {// where U is the return type
         }
         try {
             const result = this.returnFn.apply(undefined, actualArgs);
-            this.successfulCalls.push(new SuccessfulCall(this.methodName, actualArgs, result));
             this.actualTimes += 1;
+            this.successfulCalls.push(new SuccessfulCall(this.fullName + "()",
+                actualArgs, result, this.expectedTimes.describe()));
             return Optional.some(result);
         } catch (e) {
             console.debug("Problem", {e}); // todo Improve message
@@ -73,23 +76,22 @@ export class MockedCall<U> {// where U is the return type
 
     describe() {
         return {
-            methodOrFunction: this.mockName + "." + this.methodName + "()",
+            name: this.fullName + "()",
             expectedArgs: this.expectedArgs.describe(),
             expectedTimes: this.expectedTimes.describe(),
-            passed: this.hasPassed(),
-            successfulCalls: this.successfulCalls.map(c => c.describe())
+            passed: this.hasPassed()
         };
     }
 }
 
-class SuccessfulCall {
-    constructor(public methodName: string | undefined, public actualArgs: Array<any>, public returnValue: any) {
+export class SuccessfulCall {
+    constructor(public name: string,
+                public actualArgs: Array<any>,
+                public returnValue: any,
+                public expectedTime: any) {
     }
 
     describe() {
-        return {
-            actualArgs: this.actualArgs,
-            returnValue: this.returnValue
-        };
+        return this;
     }
 }
