@@ -30,8 +30,8 @@ export class Mock<T> { // One for each mocked object and function
         return mockCall;
     }
 
-    verify() {
-        this.handler.verify();
+    verify(errors: Array<any>) {
+        this.handler.verify(errors);
     }
 
     describeMocks() {

@@ -62,7 +62,6 @@ export class MockHandler implements ProxyHandler<{}> {
     has(target, propKey: string): boolean {
         const mockCalls = this.mapMethodToMockCalls.get(propKey);
         return !!mockCalls;
-
     }
 
     deleteProperty(target, propKey: string): boolean {
@@ -77,11 +76,13 @@ export class MockHandler implements ProxyHandler<{}> {
         }
     }
 
-    verify() {
-        // todo Check that expectations of all MockedCalls were met - providing details of what didn't happen, etc
+    verify(errors: Array<any>) {
+        this.mapMethodToMockCalls.forEach(mockCalls =>
+            mockCalls.filter(m => !m.hasPassed()).forEach(m => errors.push(m.describe()))
+        );
     }
 
-    describeMocks() {
+    describeMocks(): Array<any> {
         const result: Array<any> = [];
         this.mapMethodToMockCalls.forEach(mockCalls =>
             mockCalls.filter(m => m.hasRun()).forEach(m => result.push(m.describe()))

@@ -18,8 +18,8 @@ export class MockedCall<U> {// where U is the return type
         this.expectedArgs = match.array.match(expectedArguments);
     }
 
-    returns(f: (...args: Array<any>) => U): this {
-        this.returnFn = f;
+    returns(fn: (...args: Array<any>) => U): this {
+        this.returnFn = fn;
         return this;
     }
 
@@ -67,12 +67,16 @@ export class MockedCall<U> {// where U is the return type
         return this.actualTimes > 0;
     }
 
+    hasPassed(): boolean {
+        return this.expectedTimes.matches(this.actualTimes).passed();
+    }
+
     describe() {
         return {
-            methodName: this.mockName + "." + this.methodName,
+            methodOrFunction: this.mockName + "." + this.methodName + "()",
             expectedArgs: this.expectedArgs.describe(),
             expectedTimes: this.expectedTimes.describe(),
-            timesCovered: this.expectedTimes.matches(this.actualTimes).passed(),
+            passed: this.hasPassed(),
             successfulCalls: this.successfulCalls.map(c => c.describe())
         };
     }
