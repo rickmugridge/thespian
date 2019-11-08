@@ -74,13 +74,9 @@ export class MockedCall<U> {// where U is the return type
         return this.expectedTimes.matches(this.actualTimes).passed();
     }
 
-    describe() {
-        return {
-            name: this.fullName + "()",
-            expectedArgs: this.expectedArgs.describe(),
-            expectedTimes: this.expectedTimes.describe(),
-            passed: this.hasPassed()
-        };
+    describe(): UnsuccessfulCall {
+        return new UnsuccessfulCall(this.fullName + "()",
+            this.expectedArgs.describe(), this.expectedTimes.describe(), this.actualTimes);
     }
 }
 
@@ -88,7 +84,19 @@ export class SuccessfulCall {
     constructor(public name: string,
                 public actualArgs: Array<any>,
                 public returnValue: any,
-                public expectedTime: any) {
+                public expectedTimes: any) {
+    }
+
+    describe() {
+        return this;
+    }
+}
+
+export class UnsuccessfulCall {
+    constructor(public name: string,
+                public expectedArgs: any,
+                public expectedTimes: any,
+                public actualTimes: number) {
     }
 
     describe() {

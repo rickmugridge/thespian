@@ -27,6 +27,7 @@ It follows some of structure of TypeMoq, but little of the philosophy
     
 # To Do
 
+ - Verify successful calls at Thespian level
  - Include mock symbol for identifying mocks to PrettyPrinter.
  - Provide excellent error messages, especially when argument matchers fail (but close).
  - Consider tracking whether a a MockedCall may have matched, in case none do. 

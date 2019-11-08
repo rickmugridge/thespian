@@ -1,4 +1,4 @@
-import {MockedCall} from "./MockedCall";
+import {MockedCall, SuccessfulCall} from "./MockedCall";
 import {isSymbol} from "util";
 import {PrettyPrinter} from "mismatched";
 
@@ -6,6 +6,9 @@ const printer = PrettyPrinter.make();
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<string | number | symbol | undefined, Array<MockedCall<any>>>();
+
+    constructor(private successfulCalls: Array<SuccessfulCall>) {
+    }
 
     add(mockCall: MockedCall<any>) {
         const mockCalls = this.mapMethodToMockCalls.get(mockCall.methodName);
@@ -17,12 +20,11 @@ export class MockHandler implements ProxyHandler<{}> {
     }
 
     get(target, propKey: string | number | symbol, receiver): any { // actually a "(...) => any" for methods and functions
+        const self = this;
         if (isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
             return undefined;
         }
         const mockCalls = this.mapMethodToMockCalls.get(propKey);
-
-        // console.debug("get", {propKey, mockCalls}); // todo Remove
 
         function returnedFn() {
             const actualArguments = Array.from(arguments);
@@ -32,17 +34,25 @@ export class MockHandler implements ProxyHandler<{}> {
                     return did.some;
                 }
             }
+            self.displaySuccessfulCalls();
             throw new Error(`Unable to call ${propKey as string}(${printer.render(actualArguments)}) as it does not match`);
         }
 
         if (mockCalls) {
             return returnedFn;
         }
+        self.displaySuccessfulCalls();
         throw new Error(`Unable to handle call to ${propKey}()`);
     }
 
     set(target, propKey: string, value: any): boolean {
         throw new Error(`Unable to set ${propKey} to ${value}`)
+    }
+
+    displaySuccessfulCalls() {
+        if (this.successfulCalls.length > 0) {
+            console.log(printer.render(this.successfulCalls));
+        }
     }
 
     // Called by apply() and call().
