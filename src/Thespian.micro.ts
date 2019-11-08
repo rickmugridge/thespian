@@ -54,18 +54,6 @@ describe("Thespian()", () => {
         });
     });
 
-    describe("property in object: has", () => {
-        //     it("has", () => { //todo what was this for???
-        //         const thespian = new Thespian();
-        //         const mock = thespian.mock<I>("tulip");
-        //         mock
-        //             .setup(tulip => tulip.foo(2, "aaa"))
-        //             .returns(() => 44);
-        //         assertThat("foo" in mock.object).is(true);
-        //         thespian.verify();
-        //     });
-    });
-
     describe("function", () => {
         it("function called once", () => {
             let thespian = new Thespian();

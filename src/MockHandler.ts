@@ -7,7 +7,7 @@ const printer = PrettyPrinter.make();
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<string | number | symbol | undefined, Array<MockedCall<any>>>();
 
-    constructor(private successfulCalls: Array<SuccessfulCall>) {
+    constructor(private mockName: string, private successfulCalls: Array<SuccessfulCall>) {
     }
 
     add(mockCall: MockedCall<any>) {
@@ -35,14 +35,14 @@ export class MockHandler implements ProxyHandler<{}> {
                 }
             }
             self.displaySuccessfulCalls();
-            throw new Error(`Unable to call ${propKey as string}(${printer.render(actualArguments)}) as it does not match`);
+            throw new Error(`Unable to call ${self.mockName}.${propKey as string}(${printer.render(actualArguments)}) as it does not match`);
         }
 
         if (mockCalls) {
             return returnedFn;
         }
         self.displaySuccessfulCalls();
-        throw new Error(`Unable to handle call to ${propKey}()`);
+        throw new Error(`Unable to handle call to ${self.mockName}.${propKey}()`);
     }
 
     set(target, propKey: string, value: any): boolean {

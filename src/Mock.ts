@@ -11,7 +11,7 @@ export class Mock<T> { // One for each mocked object and function
 
     constructor(private mockName: string,
                 private successfulCalls: Array<SuccessfulCall>) {
-        this.handler = new MockHandler(successfulCalls);
+        this.handler = new MockHandler(mockName, successfulCalls);
         // Seems that we need the proxy target to be a function in order to allow for mocked functions!
         this.object = new Proxy(() => 3, this.handler);
     }

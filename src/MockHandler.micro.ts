@@ -8,7 +8,7 @@ const fnName = "";
 
 describe('MockHandler()', () => {
     it("Call on an unknown method", () => {
-        const handler = new MockHandler([]);
+        const handler = new MockHandler("thespian", []);
         assertThat(() =>
             handler.get(undefined, methodName, undefined)).throws(match.any());
     });
