@@ -25,6 +25,11 @@ export class MockedCall<U> {// where U is the return type
         return this;
     }
 
+    returnsVoid(): this {
+        this.returnFn = (...args: Array<any>) => undefined as any as U;
+        return this;
+    }
+
     times(count: number): this {
         this.expectedTimes = matchMaker(count);
         this.expectedTimesInProgress = match.number.lessEqual(count);

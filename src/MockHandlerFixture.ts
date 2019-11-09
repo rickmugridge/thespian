@@ -15,7 +15,7 @@ export class MockHandlerFixture {
         return mockedCall;
     }
 
-    getMock(methodName: string) {
+    getMock(methodName: string | number | symbol) {
         return this.handler.get(undefined, methodName, undefined);
     }
 

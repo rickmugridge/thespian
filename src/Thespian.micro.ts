@@ -110,8 +110,32 @@ describe("Thespian()", () => {
             thespian.verify();
         });
     });
+
+
+    //todo Fix this
+    // it("Mocks are displayed correctly when in mismatched argument list", () => {
+    //     const thespian = new Thespian();
+    //     const mockI = thespian.mock<I>("i");
+    //     mockI
+    //         .setup(g => g.foo(2, "a"))
+    //         .returns(() => 33);
+    //     const i = mockI.object;
+    //     const mockJ = thespian.mock<J>("j");
+    //     mockJ
+    //         .setup(g => g.ga(match.ofType.number()))
+    //         .returns(arg => arg);
+    //     const j = mockJ.object;
+    //     Thespian.printer.logToConsole(j[Thespian.symbolForMockToString]());
+    //     Thespian.printer.logToConsole({plainJ: j});
+    //     assertThat(j.ga(i)).is("Mock(j)")
+    // });
 });
+;
 
 interface I {
     foo(i: number, b: string): number
+}
+
+interface J {
+    ga(i: I): I
 }

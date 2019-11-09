@@ -30,4 +30,14 @@ describe("Thespian By Example", () => {
         thespian.verify();
     });
 
+    it("Simply mock a method of an interface", () => {
+        const thespian = new Thespian();
+        const mock = thespian.mock<Tell>("aTell");
+        mock
+            .setup(f => f.tellAll("elisa", 2))
+            .returns(() => 44);
+        const mocked = mock.object;
+        assertThat(mocked.tellAll("elisa", 2)).is(44);
+        thespian.verify();
+    });
 });

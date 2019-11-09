@@ -1,8 +1,6 @@
 import {MockedCall, SuccessfulCall} from "./MockedCall";
 import {isSymbol} from "util";
-import {PrettyPrinter} from "mismatched";
-
-const printer = PrettyPrinter.make();
+import {Thespian} from "./Thespian";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<string | number | symbol | undefined, Array<MockedCall<any>>>();
@@ -21,6 +19,9 @@ export class MockHandler implements ProxyHandler<{}> {
 
     get(target, propKey: string | number | symbol, receiver): any { // actually a "(...) => any" for methods and functions
         const self = this;
+        if (propKey === Thespian.symbolForMockToString) {
+            return () => `Mock(${self.mockName})`;
+        }
         if (isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
             return undefined;
         }
@@ -35,7 +36,8 @@ export class MockHandler implements ProxyHandler<{}> {
                 }
             }
             self.displaySuccessfulCalls();
-            throw new Error(`Unable to call ${self.mockName}.${propKey as string}(${printer.render(actualArguments)}) as it does not match`);
+            const theCall = `${self.mockName}.${propKey as string}(${Thespian.printer.render(actualArguments)})`;
+            throw new Error(`Unable to call ${theCall} as it does not match any mock setup calls`);
         }
 
         if (mockCalls) {
@@ -51,22 +53,21 @@ export class MockHandler implements ProxyHandler<{}> {
 
     displaySuccessfulCalls() {
         if (this.successfulCalls.length > 0) {
-            console.log(printer.render(this.successfulCalls));
+            Thespian.printer.logToConsole(this.successfulCalls);
         }
     }
 
     // Called by apply() and call().
     apply(target, thisArg, actualArguments: Array<any>) {
-        // console.debug("apply", {argumentsList: actualArguments}); // todo Remove
         const mockCalls = this.mapMethodToMockCalls.get(MockHandler.applyKey);
         for (let call of mockCalls!) {
-            const did = call.didRun(actualArguments); // todo keep the best match in case succeed
+            const did = call.didRun(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
             if (did.isSome) {
                 return did.some;
             }
         }
-        console.log(printer.render(this.describeMocks()));
-        throw new Error(`Unable to call (${printer.render(actualArguments)}), as it does not match`);
+        Thespian.printer.logToConsole(this.describeMocks());
+        throw new Error(`Unable to call (${Thespian.printer.render(actualArguments)}), as it does not match any mock setup calls`);
     }
 
     has(target, propKey: string): boolean {

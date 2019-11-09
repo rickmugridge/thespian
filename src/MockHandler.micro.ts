@@ -2,6 +2,7 @@ import {MockHandler} from "./MockHandler";
 import {assertThat} from "mismatched/dist/src/assertThat";
 import {match} from "mismatched/dist/src/match";
 import {MockHandlerFixture} from "./MockHandlerFixture";
+import {Thespian} from "./Thespian";
 
 const methodName = "method";
 const fnName = "";
@@ -77,6 +78,13 @@ describe('MockHandler()', () => {
                 {name: "thespian()", actualArgs: [1], returnValue: 456, expectedTimes: 1}
             ]);
         });
+    });
+
+    it22("symbolForMockToString", fixture => {
+        fixture.makeMock(methodName, [1])
+            .returns(() => 5);
+        const fn = fixture.getMock(Thespian.symbolForMockToString);
+        assertThat(fn()).is("Mock(thespian)");
     });
 });
 
