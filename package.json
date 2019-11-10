@@ -1,7 +1,22 @@
 {
   "name": "thespian",
-  "version": "2.0.0",
-  "main": "dist/index.js",
+  "version": "0.9.5",
+  "description": "A mocking framework with a sophisticated approach to argument matching. Written in Typescript and respects types in mocks.",
+  "author": {
+    "name": "Rick Mugridge",
+    "email": "rick.mugridge@hypr.co.nz"
+  },
+  "keywords": [
+    "mock"
+  ],
+  "license": "Apache 2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rickmugridge/thespian"
+  },
+  "homepage": "https://github.com/rickmugridge/thespian",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "engines": {
     "node": ">=10.13.0"
   },
@@ -16,7 +31,7 @@
     "@types/node": "~9.4.6",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.2",
-    "mismatched": "^1.2.2",
+    "mismatched": "1.2.4",
     "ts-node": "^6.2.0",
     "typescript": "3.5.2"
   }

@@ -1,10 +1,41 @@
 # thespian
 
-`thespian` is a mocking framework in Typescript that respects types in mocks.
-It takes a sophisticated approach to argument matching, using `mismatched`.
+`thespian` is a mocking framework with a sophisticated approach to argument matching.
+Written in Typescript and respects types in mocks.
 
 Thespians are like mocks - they play a role.
-See below, after the examples for the "design philosophy" of `thespian`.
+For the "design philosophy" of `thespian`, see below, after the examples.
+
+# Short Docs
+
+ - To create a `Thespian` in order to create mocks:
+   - `const thespian = new Thespian();`
+ - To create a mock for a class or interface (with a given name, used in error messages):
+   - `const mockCheck = thespian.mock<Check>("check");`
+    - To specify a mocked method call:
+      - `mockCheck.setup(c => c.match()).returns(() => 4);`
+    - To specify a mocked method call to be called a specific number times:
+      - `mockCheck.setup(c => c.match2("target")).returns(() => "ok").times(2);`
+ - To create a mock for a function:
+   - `const mockFn = thespian.mock<(n: number)=>number>("fun");`
+    - To specify a mocked function call:
+      - `mockFn.setup(f => f(5)).returns(() => 2);`
+    - To specify a mocked function call to be called a specific number times:
+      - `mockFn.setup(f => f(100)).returns(() => 20).timesGreater(0);`
+ - To access the underlying mock for use in tests:
+   - `const check = mockCheck.object;`
+ - To verify that all mock calls have happened:
+   - `thespian.verify();`
+
+Possible `returns`:
+  - `.returns(()=>45)`, a function that provides the result. 
+     The result can depend on the actual arguments. Eg, `.returns((a,b) => a)`.
+  - `.returnsVoid()` for when the mocked method/function does not return a result.
+
+Possible `times` checks:
+  - `.times()`, a specific `number`
+  - `.timesAtLeast()`, the minimum `number` of times
+  - `.timesAtMost()`, the macimum `number` of times
 
 # Thespian By Example
 
@@ -62,7 +93,7 @@ In the example above, we:
 
   - Create a `Thespian` object, that is responsible for creating mocks and verifying them afterwards.
   - Create two mocks of the `Command` interface. 
-    This is actually a wrapper for the mock, and allows us to specify how it acts on method calls.
+    These are actually wrappers for the mock, and allow us to specify how it acts on method calls.
   - Specify what happens when a method call is made on each mock:
     - The `setup()` specifies the method name and any arguments expected in the call. 
       In this example, there are no arguments. In general, arbitrary `mismatched` matchers can be used for the arguments.
@@ -80,37 +111,65 @@ In the example above, we:
 
 ## Mocking with sophisticated argument matching on calls
 
-..... TODO
-  
+Here's an example which involves nested object, where we match on the argument passed to the mock.
 
+```
+    it("Sophisticated matching of mock arguments", () => {
+        interface Matched {
+            matchId: number;
+            matches: Array<{
+                match_type: string,
+                links: Array<string>
+            }>;
+        }
 
+        interface Check {
+            match(match: Matched): number;
+        }
 
-
+        const thespian = new Thespian();
+        const mockCheck = thespian.mock<Check>();
+        mockCheck
+            .setup(f => f.match({
+                matchId: 0,
+                matches: [{
+                    match_type: match.string.startsWith("full"),
+                    links: match.array.length(1)
+                }]
+            }))
+            .returns(() => Math.random());
+        const check = mockCheck.object;
+        assertThat(check.match({
+            matchId: 0,
+            matches: [{
+                match_type: "full-match",
+                links: ["REL"]
+            }]
+        })).is(match.ofType.number());
+        thespian.verify();
+    });
+```
 
 If the wrong arguments are provided, we get an error:
 
 ```
-  Error: Unable to call tellAll(["elisa", 3]) as it does not match
-```
-
-If that mocked method is called a second time, an error is given:
-
-```
-[
+Error: Unable to call mock#1.match([
   {
-    name: "aTell.tellAll()", actualArgs: ["elisa", 2], returnValue: 44, 
-    expectedTimes: 1
+    matchId: 0, 
+    matches: [{match_type: "full-match", links: ["REL"]}]
   }
-]
+]) as it does not match any mock setup calls
+````
 
-Error: Unable to call aTell.tellAll(["elisa", 2]) as it does not match
-```
-
-Any mocked calls that have already been passed are shown first, as shown above.
+Any mocked calls that have already been passed are also shown.
 
 ## Mocking a Method that can be called several times
 
 ```
+    interface Tell {
+        tellAll(user: string, count: number): number
+    }
+
     it("We can call a mocked method several times", () => {
         const thespian = new Thespian();
         const mock = thespian.mock<Tell>("aTell");
@@ -134,61 +193,70 @@ In the example above, we:
      - `timesAtLeast()` with a number. Eg, `timesAtLeast(0)` shows we're happy if it's called or not.
      - `timesAtMost()` with a number. Eg, `timesAtMost(2)` shows we're happy if it's called between 0 and 2 times.
 
-If insufficient calls are made, this is picked up by `verify()`. Eg:
+If a third call is made, the following error results:
 
 ```
+Error: Unable to call aTell.tellAll(["elisa", 2]) as it does not match any mock setup calls
+Previous suceeding calls:
 [
   {
-    name: "aTell.tellAll()", expectedArgs: ["elisa", 2], expectedTimes: 2, 
-    actualTimes: 1
+    name: "aTell.tellAll()", actualArgs: ["elisa", 2], returnValue: 44, expectedTimes: 2
+  }, 
+  {
+    name: "aTell.tellAll()", actualArgs: ["elisa", 2], returnValue: 44, expectedTimes: 2
   }
 ]
-
-Error: Problem with mock expectations not being met.
 ```
 
 This shows that 2 calls were expected but only one was received.
 
-## Using `mismatched` to match arguments in mocking calls
-
-## Eg of advanced use of `returns()` - we need to return the second argument as a result
-
 ## Mocking a function
 
-# Design Philosophy
+Here's an example of a function being mocked.
+
+```
+    it("mocking a function", () => {
+        let thespian = new Thespian();
+        let mockFn = thespian.mock<(i: number) => number>("fn");
+        mockFn
+            .setup(g => g(2))
+            .returns(() => 33);
+        thespian.describeMocks();
+        assertThat(mockFn.object(2)).is(33);
+        thespian.describeMocks();
+        thespian.verify();
+    });
+
+```
+
+# `thespian` Design Decisions
 
  - `thespian` is intended to mock interfaces (or classes) and to do that simply and well. 
    It does **not** try to do fancy tricks to deal with smelly code, such as partial mocking of real objects, 
    mocking modules, mocking global variables, and etc.
- - It also mocks functions and object properties
- - Mocks are identified, so it's easier to understand error messages when multiple mocks are involved
- - Expectations are set up before running the system under test
+ - It also mocks functions (and later: object properties).
+ - Mocks are identified, so it's easier to understand error messages when multiple mocks are involved.
+ - Expectations are set up before running the system under test.
  - A test fails immediately if a call fails to match a mock - it doesn't return `undefined` by default!
-   Any mock calls that have succeeded by that point are also display, to give context.
+   Any mock calls that have succeeded by that point are also displayed, to give context.
  - A Thespian object oversees the creation of all mocks for a test. 
-   The Thespian is responsible for verification of expected calls across all mocks at once (not individually, as with TypeMoq)
- - For matching arguments, it uses `mismatched`, a matcher that has many of the properties of hamcrest.
-   This allows for sophisticated matching of arguments, unlike in most mocking frameworks.
- - It permits multiple mocked calls to the same method/function with the same arguments but different results
+   The Thespian is responsible for verification of expected calls across all mocks at once.
+ - For matching mock call arguments, it uses `mismatched`, a sophisticated matcher (originally a part of `thespian`).
+   It displays a mock in a useful form when it is the argument to a failed mock call.
+ - It permits multiple mocked calls to the same method/function with the same arguments but different results.
 
-`Thespian` follows the philosophy of `JMock2` in Java:
+`Thespian` follows the design decisions of `JMock2` in Java.
+And `mismatched` follows the design decisions of `hamcrest`.
 
 But it follows some of syntax of Moq and TypeMoq, but little of the philosophy
-  
-   mock.setup(g => g.m(1,2)).returns(() => 5).times(2)  and mock.object
     
 # To Do
 
- - Add support for mocking object properties as well.
- - Properly display the arguments of a failed call, even when a mock is an argument.
-   Include mock symbol and method for identifying mocks to PrettyPrinter.
- - Provide excellent error messages, especially when argument matchers fail but are close.
-   Track whether a MockedCall may have matched, in case none do, and show near misses.
- = Consider all error conditions - eg, inappropriate lambdas passed to .setup(), .returns(), .times(), etc.
- - Consider how to support mocks that could potentially be a Promise, in a Promise chain
-   (ie, return undefined for the property "then".
- - Provide full documentation here.
- - Make it easy to turn on helpful tracing of mock selections and calls. 
-   It can be painful when it's unclear why a mock failed.
- - consider what other Proxy methods are needed: apply() etc
- - ...
+ - Add support for mocking object properties as well (including `set()`).
+ 
+# Improvements
+
+  - Provide useful error messages when argument matchers fail but are close. Show near misses.
+ - Consider how to specify mocks that could potentially be a Promise, in a Promise chain
+   (ie, return undefined for the property "then"). Once object properties are handled, this can be done with:
+   - `mockObj.setup(m => b.then).returns(()=> undefined);`

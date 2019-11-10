@@ -84,7 +84,7 @@ describe('MockHandler()', () => {
         fixture.makeMock(methodName, [1])
             .returns(() => 5);
         const fn = fixture.getMock(Thespian.symbolForMockToString);
-        assertThat(fn()).is("Mock(thespian)");
+        assertThat(fn()).is("thespian");
     });
 });
 

@@ -5,7 +5,6 @@ import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 
 // Attached to a Handler - one for each possible call:
 export class MockedCall<U> {// where U is the return type
-    private expectedArgs: DiffMatcher<any>;
     private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;
     private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
     private actualTimes = 0;
@@ -16,8 +15,8 @@ export class MockedCall<U> {// where U is the return type
     constructor(public fullName: string,
                 public methodName: string,
                 expectedArguments: Array<any>,
-                private successfulCalls: Array<SuccessfulCall>) {
-        this.expectedArgs = match.array.match(expectedArguments);
+                private successfulCalls: Array<SuccessfulCall>,
+                private expectedArgs = match.array.match(expectedArguments)) {
     }
 
     returns(fn: (...args: Array<any>) => U): this {

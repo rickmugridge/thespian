@@ -2,21 +2,24 @@ import {MockedCall, SuccessfulCall} from "./MockedCall";
 import {MockHandler} from "./MockHandler";
 import {Optional} from "./Optional";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
+import {ofType} from "mismatched/dist/src/ofType";
 
 let expectedArgs;
 
 export class Mock<T> { // One for each mocked object and function
-    handler: MockHandler;
     object: any; // Needs to eb called "object" and need to hold a reference to it, even if we don't use it. Weird.
 
     constructor(private mockName: string,
-                private successfulCalls: Array<SuccessfulCall>) {
-        this.handler = new MockHandler(mockName, successfulCalls);
+                private successfulCalls: Array<SuccessfulCall>,
+                private handler = new MockHandler(mockName, successfulCalls)) {
         // Seems that we need the proxy target to be a function in order to allow for mocked functions!
         this.object = new Proxy(() => 3, this.handler);
     }
 
     setup<U>(f: (t: T) => U): MockedCall<U> {
+        if (!ofType.isFunction(f)) {
+            throw new Error("An arrow/function must be provided in setup()");
+        }
         const method = methodName(f);
         let fieldName = MockHandler.applyKey;
         let fullName = this.mockName;
@@ -44,7 +47,6 @@ export class Mock<T> { // One for each mocked object and function
     }
 }
 
-
 function spy() {
     expectedArgs = Array.from(arguments);
 }
@@ -63,4 +65,3 @@ function methodName<T, U>(f: (t: T) => U): Optional<string> {
     const fnName = call.slice(dot + 1, openBracket);
     return Optional.some(fnName);
 }
-

@@ -3,7 +3,7 @@ import {isSymbol} from "util";
 import {Thespian} from "./Thespian";
 
 export class MockHandler implements ProxyHandler<{}> {
-    mapMethodToMockCalls = new Map<string | number | symbol | undefined, Array<MockedCall<any>>>();
+    mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
 
     constructor(private mockName: string, private successfulCalls: Array<SuccessfulCall>) {
     }
@@ -35,26 +35,24 @@ export class MockHandler implements ProxyHandler<{}> {
                     return did.some;
                 }
             }
-            self.displaySuccessfulCalls();
             const theCall = `${self.mockName}.${propKey as string}(${Thespian.printer.render(actualArguments)})`;
-            throw new Error(`Unable to call ${theCall} as it does not match any mock setup calls`);
+            throw new Error(`Unable to call ${theCall} as it does not match any mock setup calls` +
+                self.displaySuccessfulCalls());
         }
 
         if (mockCalls) {
             return returnedFn;
         }
-        self.displaySuccessfulCalls(); // todo Put this inside the Error
-        throw new Error(`Unable to handle call to ${self.mockName}.${propKey}()`);
+        throw new Error(`Unable to handle call to ${self.mockName}.${propKey}()` +
+            self.displaySuccessfulCalls());
     }
 
-    set(target, propKey: string, value: any): boolean {
-        throw new Error(`Unable to set ${propKey} to ${value}`)
-    }
-
-    displaySuccessfulCalls() {
+    displaySuccessfulCalls(): string {
         if (this.successfulCalls.length > 0) {
-            Thespian.printer.logToConsole(this.successfulCalls);
+            return "\nPrevious suceeding calls:\n" +
+                Thespian.printer.render(this.successfulCalls);
         }
+        return "";
     }
 
     // Called by apply() and call().
@@ -69,7 +67,8 @@ export class MockHandler implements ProxyHandler<{}> {
             }
         }
         Thespian.printer.logToConsole(this.describeMocks());
-        throw new Error(`Unable to call (${Thespian.printer.render(actualArguments)}), as it does not match any mock setup calls`);
+        throw new Error(`Unable to call (${Thespian.printer.render(actualArguments)}), as it does not match any mock setup calls\n` +
+            Thespian.printer.render(this.describeMocks()));
     }
 
     has(target, propKey: string): boolean {
@@ -77,8 +76,12 @@ export class MockHandler implements ProxyHandler<{}> {
         return !!mockCalls;
     }
 
+    set(target, propKey: string, value: any): boolean {
+        throw new Error(`Not yet implemented: Unable to set ${propKey} to ${value}`)
+    }
+
     deleteProperty(target, propKey: string): boolean {
-        throw new Error(`Unable to delete property ${propKey}`)
+        throw new Error(`Not yet implemented: Unable to delete property ${propKey}`)
     }
 
     getOwnPropertyDescriptor(target, prop: string | number | symbol): PropertyDescriptor | undefined {

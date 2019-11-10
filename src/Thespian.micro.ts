@@ -1,7 +1,5 @@
 import {Thespian} from "./Thespian";
 import {assertThat, match, PrettyPrinter} from "mismatched";
-import {ofType} from "mismatched/dist/src/ofType";
-import {isUndefined} from "util";
 
 describe("Thespian()", () => {
     describe("object", () => {
@@ -114,7 +112,7 @@ describe("Thespian()", () => {
     });
 
     it("Mocks are displayed correctly when in mismatched argument list", () => {
-        PrettyPrinter.make(80,10, Thespian.symbolForMockToString);
+        PrettyPrinter.make(80, 10, Thespian.symbolForMockToString);
         const thespian = new Thespian();
         const mockI = thespian.mock<I>("i");
         mockI
@@ -126,8 +124,8 @@ describe("Thespian()", () => {
         mockJ
             .setup(g => g.ga(j))
             .returns(arg => arg);
-        assertThat(()=> j.ga(i)).throws(match.errorMessage(
-            'Unable to call j.ga([{mock: "i"}]) as it does not match any mock setup calls'))
+        assertThat(() => j.ga(i)).throwsError(
+            'Unable to call j.ga([{mock: "i"}]) as it does not match any mock setup calls')
     });
 
     it("typeof", () => {

@@ -84,7 +84,7 @@ describe("MockedCall()", () => {
             assertThat(mockedCall.didRun([7]).isSome).is(true);
             assertThat(mockedCall.didRun([7]).isSome).is(false); // as only 1 times
             assertThat(mockedCall.describe()).is({
-                name: "thespian.m()", expectedArgs: [7], actualTimes: 1
+                name: "thespian.m()", expectedArgs: [7], actualTimes: 1, expectedTimes: 1
             });
             assertThat(successfulCalls).is([
                 {name: "thespian.m()", actualArgs: [7], returnValue: 3, expectedTimes: 1}

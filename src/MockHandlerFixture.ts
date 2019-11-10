@@ -1,5 +1,7 @@
 import {MockedCall, SuccessfulCall} from "./MockedCall";
 import {MockHandler} from "./MockHandler";
+import {Thespian} from "./Thespian";
+import {isUndefined} from "util";
 
 const thespian = "thespian";
 
@@ -21,5 +23,12 @@ export class MockHandlerFixture {
 
     successes() {
         return this.successfulCalls;
+    }
+
+    // This doesn't work with promises, as Mocha.it() does not return a Promise
+    static it(name: string, fn: (fixture: Thespian) => any) {
+        const thespian = new Thespian();
+        it(name, () => fn(thespian));
+        thespian.verify();
     }
 }
