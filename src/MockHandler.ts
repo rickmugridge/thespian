@@ -20,7 +20,7 @@ export class MockHandler implements ProxyHandler<{}> {
     get(target, propKey: string | number | symbol, receiver): any { // actually a "(...) => any" for methods and functions
         const self = this;
         if (propKey === Thespian.symbolForMockToString) {
-            return () => `Mock(${self.mockName})`;
+            return () => self.mockName;
         }
         if (isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
             return undefined;
@@ -43,7 +43,7 @@ export class MockHandler implements ProxyHandler<{}> {
         if (mockCalls) {
             return returnedFn;
         }
-        self.displaySuccessfulCalls();
+        self.displaySuccessfulCalls(); // todo Put this inside the Error
         throw new Error(`Unable to handle call to ${self.mockName}.${propKey}()`);
     }
 
@@ -60,10 +60,12 @@ export class MockHandler implements ProxyHandler<{}> {
     // Called by apply() and call().
     apply(target, thisArg, actualArguments: Array<any>) {
         const mockCalls = this.mapMethodToMockCalls.get(MockHandler.applyKey);
-        for (let call of mockCalls!) {
-            const did = call.didRun(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
-            if (did.isSome) {
-                return did.some;
+        if (mockCalls) {
+            for (let call of mockCalls) {
+                const did = call.didRun(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
+                if (did.isSome) {
+                    return did.some;
+                }
             }
         }
         Thespian.printer.logToConsole(this.describeMocks());

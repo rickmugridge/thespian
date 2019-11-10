@@ -1,5 +1,7 @@
 import {Thespian} from "./Thespian";
-import {assertThat, match} from "mismatched";
+import {assertThat, match, PrettyPrinter} from "mismatched";
+import {ofType} from "mismatched/dist/src/ofType";
+import {isUndefined} from "util";
 
 describe("Thespian()", () => {
     describe("object", () => {
@@ -111,26 +113,29 @@ describe("Thespian()", () => {
         });
     });
 
+    it("Mocks are displayed correctly when in mismatched argument list", () => {
+        PrettyPrinter.make(80,10, Thespian.symbolForMockToString);
+        const thespian = new Thespian();
+        const mockI = thespian.mock<I>("i");
+        mockI
+            .setup(g => g.foo(2, "a"))
+            .returns(() => 33);
+        const i = mockI.object;
+        const mockJ = thespian.mock<J>("j");
+        const j = mockJ.object;
+        mockJ
+            .setup(g => g.ga(j))
+            .returns(arg => arg);
+        assertThat(()=> j.ga(i)).throws(match.errorMessage(
+            'Unable to call j.ga([{mock: "i"}]) as it does not match any mock setup calls'))
+    });
 
-    //todo Fix this
-    // it("Mocks are displayed correctly when in mismatched argument list", () => {
-    //     const thespian = new Thespian();
-    //     const mockI = thespian.mock<I>("i");
-    //     mockI
-    //         .setup(g => g.foo(2, "a"))
-    //         .returns(() => 33);
-    //     const i = mockI.object;
-    //     const mockJ = thespian.mock<J>("j");
-    //     mockJ
-    //         .setup(g => g.ga(match.ofType.number()))
-    //         .returns(arg => arg);
-    //     const j = mockJ.object;
-    //     Thespian.printer.logToConsole(j[Thespian.symbolForMockToString]());
-    //     Thespian.printer.logToConsole({plainJ: j});
-    //     assertThat(j.ga(i)).is("Mock(j)")
-    // });
+    it("typeof", () => {
+        const thespian = new Thespian();
+        const mockI = thespian.mock<I>("i");
+        Thespian.printer.logToConsole(typeof mockI.object);
+    });
 });
-;
 
 interface I {
     foo(i: number, b: string): number
