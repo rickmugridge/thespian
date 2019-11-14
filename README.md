@@ -54,14 +54,15 @@ The use of `thespian` is further explained below the example.
 
 ```
 import {Thespian} from "thespian";
+import {TMocked} from "thespian";
 import {assertThat} from "mismatched";
 
 describe("Thespian By Example: Undo/Redo", () => {
     it("Add two commands and undo()", () => {
         const undoRedo = new UndoManager();
         const thespian = new Thespian();
-        const edit = thespian.mock<Command>("edit");
-        const replace = thespian.mock<Command>("replace");
+        const edit: TMocked<Command> = thespian.mock<Command>("edit");
+        const replace: TMocked<Command> = thespian.mock<Command>("replace");
 
         // Given
         replace
@@ -256,7 +257,9 @@ But it follows some of syntax of Moq and TypeMoq, but little of the philosophy
  
 # Improvements
 
+  - Improve error message when call a mocked method too many times.
+    Check if it matches before checking times, so can provide as a "close match" near miss.
   - Provide useful error messages when argument matchers fail but are close. Show near misses.
- - Consider how to specify mocks that could potentially be a Promise, in a Promise chain
+  - Consider how to specify mocks that could potentially be a Promise, in a Promise chain
    (ie, return undefined for the property "then"). Once object properties are handled, this can be done with:
-   - `mockObj.setup(m => b.then).returns(()=> undefined);`
+     - `mockObj.setup(m => b.then).returns(()=> undefined);`

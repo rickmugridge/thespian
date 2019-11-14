@@ -1,7 +1,8 @@
 import {Optional} from "./Optional";
 import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
-import {match} from "mismatched";
+import {match, PrettyPrinter} from "mismatched";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
+import {Thespian} from "./Thespian";
 
 // Attached to a Handler - one for each possible call:
 export class MockedCall<U> {// where U is the return type
@@ -65,7 +66,7 @@ export class MockedCall<U> {// where U is the return type
                 actualArgs, result, this.expectedTimes.describe()));
             return Optional.some(result);
         } catch (e) {
-            console.debug("Problem", {e}); // todo Improve message
+            Thespian.printer.logToConsole({exception: "In MockedCall.didRun()", e}); // todo Improve message
         }
         return Optional.none;
     }
@@ -92,7 +93,11 @@ export class SuccessfulCall {
     }
 
     describe() {
-        return this;
+        return {
+            call: {[PrettyPrinter.symbolForPseudoCall]: this.name, args: this.actualArgs},
+            returned: this.returnValue,
+            expectedTimes: this.expectedTimes
+        };
     }
 }
 

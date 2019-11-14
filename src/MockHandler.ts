@@ -1,6 +1,7 @@
 import {MockedCall, SuccessfulCall} from "./MockedCall";
 import {isSymbol} from "util";
 import {Thespian} from "./Thespian";
+import {PrettyPrinter} from "mismatched";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
@@ -27,7 +28,7 @@ export class MockHandler implements ProxyHandler<{}> {
         }
         const mockCalls = this.mapMethodToMockCalls.get(propKey);
 
-        function returnedFn() {
+        function returnedFn() {// Seems to have to be a function for it to work
             const actualArguments = Array.from(arguments);
             for (let call of mockCalls!) {
                 const did = call.didRun(actualArguments); // todo keep the best match in case succeed
@@ -35,25 +36,26 @@ export class MockHandler implements ProxyHandler<{}> {
                     return did.some;
                 }
             }
-            const theCall = `${self.mockName}.${propKey as string}(${Thespian.printer.render(actualArguments)})`;
-            throw new Error(`Unable to call ${theCall} as it does not match any mock setup calls` +
-                self.displaySuccessfulCalls());
+            self.error({
+                problem: "Unable to handle call to mock, as none match",
+                mockCall: {
+                    [PrettyPrinter.symbolForPseudoCall]: `${self.mockName}.${propKey.toString()}`,
+                    args: actualArguments
+                },
+                previousSuccessfulCalls: self.successfulCalls.map(s => s.describe())
+            });
         }
 
         if (mockCalls) {
             return returnedFn;
         }
-        throw new Error(`Unable to handle call to ${self.mockName}.${propKey}()` +
-            self.displaySuccessfulCalls());
+        this.error({
+            problem: "Unable to handle call, as no mocks",
+            mockCall: {[PrettyPrinter.symbolForPseudoCall]: `${self.mockName}.${propKey.toString()}`},
+            previousSuccessfulCalls: this.successfulCalls.map(s => s.describe())
+        });
     }
 
-    displaySuccessfulCalls(): string {
-        if (this.successfulCalls.length > 0) {
-            return "\nPrevious suceeding calls:\n" +
-                Thespian.printer.render(this.successfulCalls);
-        }
-        return "";
-    }
 
     // Called by apply() and call().
     apply(target, thisArg, actualArguments: Array<any>) {
@@ -66,9 +68,18 @@ export class MockHandler implements ProxyHandler<{}> {
                 }
             }
         }
-        Thespian.printer.logToConsole(this.describeMocks());
-        throw new Error(`Unable to call (${Thespian.printer.render(actualArguments)}), as it does not match any mock setup calls\n` +
-            Thespian.printer.render(this.describeMocks()));
+        this.error({
+            problem: "Unable to handle call to mock, as none match",
+            mockCall: {
+                [PrettyPrinter.symbolForPseudoCall]: this.mockName,
+                args: actualArguments
+            },
+            previousSuccessfulCalls: this.successfulCalls.map(s => s.describe())
+        });
+    }
+
+    error(msg: object) {
+        throw new Error(Thespian.printer.render(msg));
     }
 
     has(target, propKey: string): boolean {

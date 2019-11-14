@@ -1,5 +1,5 @@
 import {Thespian} from "./Thespian";
-import {Mock} from "./Mock";
+import {Mocked} from "./Mocked";
 import {assertThat, match} from "mismatched";
 import {MockHandler} from "./MockHandler";
 import {MockedCall} from "./MockedCall";
@@ -29,7 +29,7 @@ describe("Mock:", () => {
         it("Is a function", () => {
             const fixture = new MockFixture();
             const {mockHandler} = fixture;
-            const mockUnderTest = new Mock<() => number>("mockFnName", [],
+            const mockUnderTest = new Mocked<() => number>("mockFnName", [],
                 mockHandler.object);
             const expected = {
                 fullName: "mockFnName", methodName: "", successfulCalls: [],
@@ -69,7 +69,7 @@ describe("Mock:", () => {
 class MockFixture {
     thespian = new Thespian();
     mockHandler = this.thespian.mock<MockHandler>("mockHandler");
-    mockUnderTest = new Mock<J>("mockName", [], this.mockHandler.object);
+    mockUnderTest = new Mocked<J>("mockName", [], this.mockHandler.object);
 
     verify() {
         this.thespian.verify();

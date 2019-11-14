@@ -124,8 +124,10 @@ describe("Thespian()", () => {
         mockJ
             .setup(g => g.ga(j))
             .returns(arg => arg);
-        assertThat(() => j.ga(i)).throwsError(
-            'Unable to call j.ga([{mock: "i"}]) as it does not match any mock setup calls')
+        assertThat(() => j.ga(i)).throws(new Error(`{
+  problem: "Unable to handle call to mock, as none match", 
+  mockCall: j.ga({mock: "i"}), previousSuccessfulCalls: []
+}`))
     });
 
     it("typeof", () => {

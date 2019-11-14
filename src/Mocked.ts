@@ -3,11 +3,12 @@ import {MockHandler} from "./MockHandler";
 import {Optional} from "./Optional";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {ofType} from "mismatched/dist/src/ofType";
+import {TMocked} from "./TMocked";
 
 let expectedArgs;
 
-export class Mock<T> { // One for each mocked object and function
-    object: any; // Needs to eb called "object" and need to hold a reference to it, even if we don't use it. Weird.
+export class Mocked<T> implements TMocked<T> { // One for each mocked object and function
+    public object: any; // Access the underlying mock.
 
     constructor(private mockName: string,
                 private successfulCalls: Array<SuccessfulCall>,

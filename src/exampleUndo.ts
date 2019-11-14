@@ -1,12 +1,13 @@
 import {Thespian} from "./Thespian";
 import {assertThat} from "mismatched";
+import {TMocked} from "./TMocked";
 
 describe("Thespian By Example: Undo/Redo", () => {
     it("Add two commands and undo()", () => {
         const undoRedo = new UndoManager();
         const thespian = new Thespian();
-        const edit = thespian.mock<Command>("edit");
-        const replace = thespian.mock<Command>("replace");
+        const edit: TMocked<Command> = thespian.mock<Command>("edit");
+        const replace: TMocked<Command> = thespian.mock<Command>("replace");
 
         // Given
         replace
