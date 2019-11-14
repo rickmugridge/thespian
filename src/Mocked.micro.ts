@@ -1,10 +1,9 @@
 import {Thespian} from "./Thespian";
 import {Mocked} from "./Mocked";
-import {assertThat, match} from "mismatched";
+import {assertThat} from "mismatched";
 import {MockHandler} from "./MockHandler";
-import {MockedCall} from "./MockedCall";
 
-describe("Mock:", () => {
+describe("Mocked:", () => {
     describe("setUp():", () => {
         it("Expects a lambda", () => {
             const fixture = new MockFixture();

@@ -1,5 +1,6 @@
-import {createPseudoCall, MockedCall, SuccessfulCall} from "./MockedCall";
 import {assertThat} from "mismatched";
+import {createPseudoCall, SuccessfulCall} from "./SuccessfulCall";
+import {MockedCall} from "./MockedCall";
 
 describe("MockedCall()", () => {
     describe("setup:", () => {
@@ -53,27 +54,27 @@ describe("MockedCall()", () => {
             const mockedCall = new MockedCall("thespian.m", "m", [3], [])
                 .returns(() => 5)
                 .times(0);
-            assertThat(mockedCall.matchToRunResult([1]).isSome).is(false);
+            assertThat(mockedCall.matchToRunResult([1]).failed).isNot(undefined);
         });
 
         it("Fails as actualTimes === expectedTimes", () => {
             const mockedCall = new MockedCall("thespian.m", "m", [4], [])
                 .times(0)
                 .returns(f);
-            assertThat(mockedCall.matchToRunResult([1]).isSome).is(false);
+            assertThat(mockedCall.matchToRunResult([1]).failed).isNot(undefined);
         });
 
         it("Fails as args don't match due to length difference", () => {
             const mockedCall = new MockedCall("thespian.m", "m", [5], [])
                 .returns(f);
-            assertThat(mockedCall.matchToRunResult([]).isSome).is(false);
+            assertThat(mockedCall.matchToRunResult([]).failed).isNot(undefined);
         });
 
         it("Fails as args don't match due to args difference", () => {
             const successfulCalls: Array<SuccessfulCall> = [];
             const mockedCall = new MockedCall("thespian.m", "m", [6], successfulCalls)
                 .returns(f);
-            assertThat(mockedCall.matchToRunResult([2]).isSome).is(false);
+            assertThat(mockedCall.matchToRunResult([2]).failed).isNot(undefined);
             assertThat(successfulCalls).is([]);
         });
 
@@ -81,8 +82,8 @@ describe("MockedCall()", () => {
             const successfulCalls: Array<SuccessfulCall> = [];
             const mockedCall = new MockedCall("thespian.m", "m", [7], successfulCalls)
                 .returns(f);
-            assertThat(mockedCall.matchToRunResult([7]).isSome).is(true);
-            assertThat(mockedCall.matchToRunResult([7]).isSome).is(false); // as only 1 times
+            assertThat(mockedCall.matchToRunResult([7]).failed).is(undefined);
+            assertThat(mockedCall.matchToRunResult([7]).failed).isNot(undefined); // as only 1 times
             assertThat(mockedCall.describe()).is({
                 call: createPseudoCall("thespian.m", [7]),
                 actualTimes: 1, expectedTimes: 1

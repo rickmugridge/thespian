@@ -1,9 +1,10 @@
-import {MockedCall, SuccessfulCall} from "./MockedCall";
+import {MockedCall} from "./MockedCall";
 import {MockHandler} from "./MockHandler";
 import {Optional} from "./Optional";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {ofType} from "mismatched/dist/src/ofType";
 import {TMocked} from "./TMocked";
+import {SuccessfulCall} from "./SuccessfulCall";
 
 let expectedArgs;
 

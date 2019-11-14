@@ -1,7 +1,7 @@
 import {Mocked} from "./Mocked";
 import {PrettyPrinter} from "mismatched";
-import {SuccessfulCall} from "./MockedCall";
 import {TMocked} from "./TMocked";
+import {SuccessfulCall} from "./SuccessfulCall";
 
 let mockCount = 1;
 

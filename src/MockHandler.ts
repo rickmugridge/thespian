@@ -1,7 +1,8 @@
-import {MockedCall, SuccessfulCall} from "./MockedCall";
+import {MockedCall} from "./MockedCall";
 import {isSymbol} from "util";
 import {Thespian} from "./Thespian";
 import {PrettyPrinter} from "mismatched";
+import {SuccessfulCall} from "./SuccessfulCall";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
@@ -26,52 +27,43 @@ export class MockHandler implements ProxyHandler<{}> {
         if (isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
             return undefined;
         }
-        const mockCalls = this.mapMethodToMockCalls.get(propKey);
+        const fullMockName = `${self.mockName}.${propKey.toString()}`;
 
-        function returnedFn() {// Seems to have to be a function for it to work
-            const actualArguments = Array.from(arguments);
-            for (let call of mockCalls!) {
-                const did = call.matchToRunResult(actualArguments); // todo keep the best match in case succeed
-                if (did.isSome) {
-                    return did.some;
-                }
-            }
-            self.error({
-                problem: "Unable to handle call to mock, as none match",
-                mockCall: {
-                    [PrettyPrinter.symbolForPseudoCall]: `${self.mockName}.${propKey.toString()}`,
-                    args: actualArguments
-                },
-                previousSuccessfulCalls: self.successfulCalls.map(s => s.describe())
-            });
+        function returnedFn() { // Seems to have to be a function for it to work
+            return self.runRightCall(propKey, fullMockName, Array.from(arguments));
         }
 
+        const mockCalls = this.mapMethodToMockCalls.get(propKey);
         if (mockCalls) {
             return returnedFn;
         }
-        this.error({
-            problem: "Unable to handle call, as no mocks",
-            mockCall: {[PrettyPrinter.symbolForPseudoCall]: `${self.mockName}.${propKey.toString()}`},
-            previousSuccessfulCalls: this.successfulCalls.map(s => s.describe())
-        });
+        self.failedToMatch(fullMockName, [], "Unable to handle call to mock, as none defined");
     }
 
 
     // Called by apply() and call().
     apply(target, thisArg, actualArguments: Array<any>) {
-        const mockCalls = this.mapMethodToMockCalls.get(MockHandler.applyKey);
+        return this.runRightCall(MockHandler.applyKey, this.mockName, actualArguments);
+    }
+
+    runRightCall(key: string | number | symbol, mockName: string, actualArguments: Array<any>): any {
+        const mockCalls = this.mapMethodToMockCalls.get(key);
         if (mockCalls) {
             for (let call of mockCalls) {
                 const did = call.matchToRunResult(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
-                if (did.isSome) {
-                    return did.some;
+                if (!did.failed) {
+                    return did.result;
                 }
             }
         }
+        this.failedToMatch(mockName, actualArguments, "Unable to handle call to mock, as none match");
+    }
+
+    private failedToMatch(mockName: string, actualArguments: Array<any>, problem: string) {
         this.error({
-            problem: "Unable to handle call to mock, as none match",
+            problem,
             mockCall: {
-                [PrettyPrinter.symbolForPseudoCall]: this.mockName,
+                [PrettyPrinter.symbolForPseudoCall]: mockName,
                 args: actualArguments
             },
             previousSuccessfulCalls: this.successfulCalls.map(s => s.describe())

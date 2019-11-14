@@ -61,9 +61,7 @@ describe("Thespian()", () => {
             mock
                 .setup(g => g(2))
                 .returns(() => 33);
-            thespian.describeMocks();
             assertThat(mock.object(2)).is(33);
-            thespian.describeMocks();
             thespian.verify();
         });
 
@@ -74,11 +72,8 @@ describe("Thespian()", () => {
                 .setup(g => g(2))
                 .returns(() => 33)
                 .times(2);
-            thespian.describeMocks();
             assertThat(mock.object(2)).is(33);
-            thespian.describeMocks();
             assertThat(mock.object(2)).is(33);
-            thespian.describeMocks();
             thespian.verify();
         });
 
@@ -128,12 +123,6 @@ describe("Thespian()", () => {
   problem: "Unable to handle call to mock, as none match", 
   mockCall: j.ga({mock: "i"}), previousSuccessfulCalls: []
 }`))
-    });
-
-    it("typeof", () => {
-        const thespian = new Thespian();
-        const mockI = thespian.mock<I>("i");
-        Thespian.printer.logToConsole(typeof mockI.object);
     });
 });
 

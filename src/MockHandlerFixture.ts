@@ -1,7 +1,7 @@
-import {MockedCall, SuccessfulCall} from "./MockedCall";
+import {MockedCall} from "./MockedCall";
 import {MockHandler} from "./MockHandler";
 import {Thespian} from "./Thespian";
-import {isUndefined} from "util";
+import {SuccessfulCall} from "./SuccessfulCall";
 
 const thespian = "thespian";
 

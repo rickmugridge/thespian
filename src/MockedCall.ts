@@ -1,8 +1,8 @@
-import {Optional} from "./Optional";
 import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
-import {match, PrettyPrinter} from "mismatched";
+import {match} from "mismatched";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {Thespian} from "./Thespian";
+import {SuccessfulCall, UnsuccessfulCall} from "./SuccessfulCall";
 
 // Attached to a Handler - one for each possible call:
 export class MockedCall<U> {// where U is the return type
@@ -48,27 +48,39 @@ export class MockedCall<U> {// where U is the return type
         return this;
     }
 
-    matchToRunResult(actualArgs: Array<any>): Optional<any> {
+    matchToRunResult(actualArgs: Array<any>): RunResult {
         if (!this.returnFn) {
             throw new Error(`A returns() function is needed for mock for "${this.fullName}()"`);
         }
+        // todo Add extra undefined to actualArgs if not long enough
+        const matchResult = this.expectedArgs.matches(actualArgs);
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
-        if (timesIncorrect) {
-            return Optional.none;
+        const times = (timesIncorrect) ? this.actualTimes + 1 : this.actualTimes;
+        if (!matchResult.passed()) {
+            return this.makeNearMiss(matchResult, times);
         }
-        if (!this.expectedArgs.matches(actualArgs).passed()) {
-            return Optional.none;
+        if (timesIncorrect) {
+            // return this.makeNearMiss( // todo Include problem in diff??
+            //     new MatchResult(matchResult.diff, matchResult.compares + 1, matchResult.matches));
+            return this.makeNearMiss(matchResult, times);
         }
         try {
             const result = this.returnFn.apply(undefined, actualArgs);
             this.actualTimes += 1;
             this.successfulCalls.push(SuccessfulCall.make(this.fullName,
                 actualArgs, result, this.expectedTimes.describe()));
-            return Optional.some(result);
+            return {result};
         } catch (e) {
             Thespian.printer.logToConsole({exception: "In MockedCall.didRun()", e}); // todo Improve message
+            throw e;
         }
-        return Optional.none;
+    }
+
+    makeNearMiss(matchResult, actualTimes: number) {
+        return {
+            failed: UnsuccessfulCall.makeNearMiss(this.fullName,
+                matchResult, this.expectedTimes.describe(), actualTimes)
+        };
     }
 
     hasRun(): boolean {
@@ -85,46 +97,7 @@ export class MockedCall<U> {// where U is the return type
     }
 }
 
-export class SuccessfulCall {
-    type_: "Successful";
-
-    private constructor(public call: object, public returnValue: any, public expectedTimes: any) {
-    }
-
-    describe() {
-        return this;
-    }
-
-    static make(name: string,
-                args: Array<any>,
-                returnValue: any,
-                expectedTimes: any) {
-        return new SuccessfulCall(createPseudoCall(name, args),
-            returnValue, expectedTimes);
-    }
-}
-
-export class UnsuccessfulCall {
-    type_: "Unsuccessful";
-
-    private constructor(public call: object,
-                        public expectedTimes: any,
-                        public actualTimes: number) {
-    }
-
-    describe() {
-        return this;
-    }
-
-    static make(name: string,
-                expectedArgs: any,
-                expectedTimes: any,
-                actualTimes: number) {
-        return new UnsuccessfulCall(createPseudoCall(name, expectedArgs),
-            expectedTimes, actualTimes);
-    }
-}
-
-export function createPseudoCall(name: string, args: Array<any>) {
-    return {[PrettyPrinter.symbolForPseudoCall]: name, args};
+export interface RunResult {
+    result?: any;
+    failed?: UnsuccessfulCall;
 }

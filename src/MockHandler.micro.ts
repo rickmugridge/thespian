@@ -3,7 +3,7 @@ import {assertThat} from "mismatched/dist/src/assertThat";
 import {match} from "mismatched/dist/src/match";
 import {MockHandlerFixture} from "./MockHandlerFixture";
 import {Thespian} from "./Thespian";
-import {createPseudoCall} from "./MockedCall";
+import {createPseudoCall} from "./SuccessfulCall";
 
 const methodName = "method";
 const fnName = "";
