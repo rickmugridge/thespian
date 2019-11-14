@@ -3,6 +3,7 @@ import {assertThat} from "mismatched/dist/src/assertThat";
 import {match} from "mismatched/dist/src/match";
 import {MockHandlerFixture} from "./MockHandlerFixture";
 import {Thespian} from "./Thespian";
+import {createPseudoCall} from "./MockedCall";
 
 const methodName = "method";
 const fnName = "";
@@ -15,29 +16,32 @@ describe('MockHandler()', () => {
     });
 
     describe('method:', () => {
-        it22("Call known method with a single MockedCall, with undefined result", fixture => {
+        it("Call known method with a single MockedCall, with undefined result", () => {
+            const fixture = new MockHandlerFixture();
             fixture.makeMock(methodName, [match.any()])
                 .returns(a => a);
             const fn = fixture.getMock(methodName);
             assertThat(fn(5)).is(5);
             assertThat(fixture.successes()).is([{
-                name: "thespian.method()", actualArgs: [5], returnValue: 5,
-                expectedTimes: 1
+                call: createPseudoCall("thespian.method", [5]),
+                returnValue: 5, expectedTimes: 1
             }]);
         });
 
-        it22("Call known method with a single MockedCall, with specified result", fixture => {
+        it("Call known method with a single MockedCall, with specified result", () => {
+            const fixture = new MockHandlerFixture();
             fixture.makeMock(methodName, [1])
                 .returns(() => 456);
             const fn = fixture.getMock(methodName);
             assertThat(fn(1)).is(456);
             assertThat(fixture.successes()).is([{
-                name: "thespian.method()", actualArgs: [1], returnValue: 456,
-                expectedTimes: 1
+                call: createPseudoCall("thespian.method", [1]),
+                returnValue: 456, expectedTimes: 1
             }]);
         });
 
-        it22("Call known method with a single MockedCall, but doesn't match", fixture => {
+        it("Call known method with a single MockedCall, but doesn't match", () => {
+            const fixture = new MockHandlerFixture();
             fixture.makeMock(methodName, [1])
                 .returns(() => 456);
             const fn = fixture.getMock(methodName);
@@ -45,7 +49,8 @@ describe('MockHandler()', () => {
             assertThat(fixture.successes()).is([]);
         });
 
-        it22("Call known method with a 2 MockedCall2, with one matching", fixture => {
+        it("Call known method with a 2 MockedCall2, with one matching", () => {
+            const fixture = new MockHandlerFixture();
             fixture.makeMock(methodName, [1, 2])
                 .returns(() => 456);
             fixture.makeMock(methodName, [2, 3])
@@ -54,14 +59,15 @@ describe('MockHandler()', () => {
             assertThat(fn(1, 2)).is(456);
             assertThat(fn(2, 3)).is(789);
             assertThat(fixture.successes()).is([
-                {name: "thespian.method()", actualArgs: [1, 2], returnValue: 456, expectedTimes: 1},
-                {name: "thespian.method()", actualArgs: [2, 3], returnValue: 789, expectedTimes: 1}
+                {call: createPseudoCall("thespian.method", [1, 2]), returnValue: 456, expectedTimes: 1},
+                {call: createPseudoCall("thespian.method", [2, 3]), returnValue: 789, expectedTimes: 1}
             ]);
         });
     });
 
     describe('function:', () => {
-        it22("Call known function with no match", fixture => {
+        it("Call known function with no match", () => {
+            const fixture = new MockHandlerFixture();
             fixture.makeMock(fnName, [1])
                 .returns(() => 5);
             const fn = fixture.getMock(fnName);
@@ -69,18 +75,21 @@ describe('MockHandler()', () => {
             assertThat(fixture.successes()).is([]);
         });
 
-        it22("Call known function with a match", fixture => {
+        it("Call known function with a match", () => {
+            const fixture = new MockHandlerFixture();
             const mockedCall = fixture.makeMock(fnName, [1])
                 .returns(() => 456);
             const fn = fixture.getMock(fnName);
             assertThat(fn(1)).is(456);
             assertThat(fixture.successes()).is([
-                {name: "thespian()", actualArgs: [1], returnValue: 456, expectedTimes: 1}
+                {call: createPseudoCall("thespian.method", [1]),
+                    returnValue: 456, expectedTimes: 1}
             ]);
         });
     });
 
-    it22("symbolForMockToString", fixture => {
+    it("symbolForMockToString", () => {
+        const fixture = new MockHandlerFixture();
         fixture.makeMock(methodName, [1])
             .returns(() => 5);
         const fn = fixture.getMock(Thespian.symbolForMockToString);
@@ -88,7 +97,3 @@ describe('MockHandler()', () => {
     });
 });
 
-function it22(name: string, fn: (fixture: MockHandlerFixture) => any) {
-    const fixture = new MockHandlerFixture();
-    it(name, () => fn(fixture));
-}

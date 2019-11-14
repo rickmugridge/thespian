@@ -31,7 +31,7 @@ export class MockHandler implements ProxyHandler<{}> {
         function returnedFn() {// Seems to have to be a function for it to work
             const actualArguments = Array.from(arguments);
             for (let call of mockCalls!) {
-                const did = call.didRun(actualArguments); // todo keep the best match in case succeed
+                const did = call.matchToRunResult(actualArguments); // todo keep the best match in case succeed
                 if (did.isSome) {
                     return did.some;
                 }
@@ -62,7 +62,7 @@ export class MockHandler implements ProxyHandler<{}> {
         const mockCalls = this.mapMethodToMockCalls.get(MockHandler.applyKey);
         if (mockCalls) {
             for (let call of mockCalls) {
-                const did = call.didRun(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
+                const did = call.matchToRunResult(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
                 if (did.isSome) {
                     return did.some;
                 }

@@ -48,7 +48,7 @@ export class MockedCall<U> {// where U is the return type
         return this;
     }
 
-    didRun(actualArgs: Array<any>): Optional<any> {
+    matchToRunResult(actualArgs: Array<any>): Optional<any> {
         if (!this.returnFn) {
             throw new Error(`A returns() function is needed for mock for "${this.fullName}()"`);
         }
@@ -62,7 +62,7 @@ export class MockedCall<U> {// where U is the return type
         try {
             const result = this.returnFn.apply(undefined, actualArgs);
             this.actualTimes += 1;
-            this.successfulCalls.push(new SuccessfulCall(this.fullName + "()",
+            this.successfulCalls.push(SuccessfulCall.make(this.fullName,
                 actualArgs, result, this.expectedTimes.describe()));
             return Optional.some(result);
         } catch (e) {
@@ -80,35 +80,51 @@ export class MockedCall<U> {// where U is the return type
     }
 
     describe(): UnsuccessfulCall {
-        return new UnsuccessfulCall(this.fullName + "()",
+        return UnsuccessfulCall.make(this.fullName,
             this.expectedArgs.describe(), this.expectedTimes.describe(), this.actualTimes);
     }
 }
 
 export class SuccessfulCall {
-    constructor(public name: string,
-                public actualArgs: Array<any>,
-                public returnValue: any,
-                public expectedTimes: any) {
-    }
+    type_: "Successful";
 
-    describe() {
-        return {
-            call: {[PrettyPrinter.symbolForPseudoCall]: this.name, args: this.actualArgs},
-            returned: this.returnValue,
-            expectedTimes: this.expectedTimes
-        };
-    }
-}
-
-export class UnsuccessfulCall {
-    constructor(public name: string,
-                public expectedArgs: any,
-                public expectedTimes: any,
-                public actualTimes: number) {
+    private constructor(public call: object, public returnValue: any, public expectedTimes: any) {
     }
 
     describe() {
         return this;
     }
+
+    static make(name: string,
+                args: Array<any>,
+                returnValue: any,
+                expectedTimes: any) {
+        return new SuccessfulCall(createPseudoCall(name, args),
+            returnValue, expectedTimes);
+    }
+}
+
+export class UnsuccessfulCall {
+    type_: "Unsuccessful";
+
+    private constructor(public call: object,
+                        public expectedTimes: any,
+                        public actualTimes: number) {
+    }
+
+    describe() {
+        return this;
+    }
+
+    static make(name: string,
+                expectedArgs: any,
+                expectedTimes: any,
+                actualTimes: number) {
+        return new UnsuccessfulCall(createPseudoCall(name, expectedArgs),
+            expectedTimes, actualTimes);
+    }
+}
+
+export function createPseudoCall(name: string, args: Array<any>) {
+    return {[PrettyPrinter.symbolForPseudoCall]: name, args};
 }
