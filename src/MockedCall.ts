@@ -1,5 +1,5 @@
 import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
-import {match} from "mismatched";
+import {match, MatchResult} from "mismatched";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {Thespian} from "./Thespian";
 import {SuccessfulCall, UnsuccessfulCall} from "./SuccessfulCall";
@@ -53,7 +53,7 @@ export class MockedCall<U> {// where U is the return type
             throw new Error(`A returns() function is needed for mock for "${this.fullName}()"`);
         }
         // todo Add extra undefined to actualArgs if not long enough
-        const matchResult = this.expectedArgs.matches(actualArgs);
+        const matchResult: MatchResult = this.expectedArgs.matches(actualArgs);
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         const times = (timesIncorrect) ? this.actualTimes + 1 : this.actualTimes;
         if (!matchResult.passed()) {
@@ -62,7 +62,9 @@ export class MockedCall<U> {// where U is the return type
         if (timesIncorrect) {
             // return this.makeNearMiss( // todo Include problem in diff??
             //     new MatchResult(matchResult.diff, matchResult.compares + 1, matchResult.matches));
-            return this.makeNearMiss(matchResult, times);
+            const failed = UnsuccessfulCall.make(this.fullName, matchResult.matchRate, actualArgs,
+                this.expectedTimes.describe(), this.actualTimes + 1);
+            return {failed};
         }
         try {
             const result = this.returnFn.apply(undefined, actualArgs);
@@ -91,9 +93,9 @@ export class MockedCall<U> {// where U is the return type
         return this.expectedTimes.matches(this.actualTimes).passed();
     }
 
-    describe(): UnsuccessfulCall {
-        return UnsuccessfulCall.make(this.fullName,
-            this.expectedArgs.describe(), this.expectedTimes.describe(), this.actualTimes);
+    describe() {
+        return UnsuccessfulCall.make(this.fullName, 0,
+            this.expectedArgs.describe(), this.expectedTimes.describe(), this.actualTimes).describe();
     }
 }
 

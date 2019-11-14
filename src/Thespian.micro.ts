@@ -1,5 +1,5 @@
 import {Thespian} from "./Thespian";
-import {assertThat, match, PrettyPrinter} from "mismatched";
+import {assertThat, match, MatchResult, PrettyPrinter} from "mismatched";
 
 describe("Thespian()", () => {
     describe("object", () => {
@@ -52,6 +52,77 @@ describe("Thespian()", () => {
             assertThat(mock.object.foo(2, "aaa")).is(44);
             thespian.verify();
         });
+
+        it("method called with no mock set up for it", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            assertThat(() => mock.object.foo(2, "aaa")).throwsError(`{
+  problem: "Unable to handle call, as none defined", 
+  mockCall: anObject.foo(2, "aaa")
+}`);
+            thespian.verify();
+        });
+
+        it("method called but arguments do not match", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.foo(2, match.ofType.string()))
+                .returns(() => 44);
+            assertThat(() => mock.object.foo(4, "aaa")).throwsError(`{
+  problem: "Unable to handle call, as none match", 
+  mockCall: anObject.foo(4, "aaa"), 
+  nearMisses: [
+    {
+      call: anObject.foo(
+        {${MatchResult.was}: 4, ${MatchResult.expected}: 2}, "aaa"
+      ), expectedTimes: 1, actualTimes: 0
+    }
+  ]
+}`);
+            // thespian.verify(); Don't verify
+        });
+
+        it("a method called a second time, exceeding expected times", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.foo(2, "aaa"))
+                .returns(() => 44);
+            assertThat(mock.object.foo(2, "aaa")).is(44);
+            assertThat(()=>mock.object.foo(2, "aaa")).throwsError(`{
+  problem: "Unable to handle call, as it's called too many times", 
+  mockCall: anObject.foo(2, "aaa"), 
+  previousSuccessfulCalls: [
+    {
+      call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1
+    }
+  ]
+}`);
+            thespian.verify();
+        });
+
+//         it("a method called a second time, exceeding expected times #2", () => {
+//             const thespian = new Thespian();
+//             const mock = thespian.mock<I>("anObject");
+//             mock
+//                 .setup(f => f.foo(2, "aaa"))
+//                 .returns(() => 44);
+//             mock
+//                 .setup(f => f.foo(3, "aaa"))
+//                 .returns(() => 55);
+//             assertThat(mock.object.foo(2, "aaa")).is(44);
+//             assertThat(()=>mock.object.foo(2, "aaa")).throwsError(`{
+//   problem: "Unable to handle call, as it's called too many times",
+//   mockCall: anObject.foo(2, "aaa"),
+//   previousSuccessfulCalls: [
+//     {
+//       call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1
+//     }
+//   ]
+// }`);
+//             thespian.verify();
+//         });
     });
 
     describe("function", () => {
@@ -120,8 +191,9 @@ describe("Thespian()", () => {
             .setup(g => g.ga(j))
             .returns(arg => arg);
         assertThat(() => j.ga(i)).throws(new Error(`{
-  problem: "Unable to handle call to mock, as none match", 
-  mockCall: j.ga({mock: "i"}), previousSuccessfulCalls: []
+  problem: "Unable to handle call, as none match", mockCall: j.ga(
+    {mock: "i"}
+  )
 }`))
     });
 });

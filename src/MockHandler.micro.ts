@@ -12,7 +12,10 @@ describe('MockHandler()', () => {
     it("Call on an unknown method", () => {
         const handler = new MockHandler("thespian", []);
         assertThat(() =>
-            handler.get(undefined, methodName, undefined)).throws(match.any());
+            handler.get(undefined, methodName, undefined)(12)).throwsError(`{
+  problem: "Unable to handle call, as none defined", 
+  mockCall: thespian.method(12)
+}`);
     });
 
     describe('method:', () => {
@@ -82,8 +85,10 @@ describe('MockHandler()', () => {
             const fn = fixture.getMock(fnName);
             assertThat(fn(1)).is(456);
             assertThat(fixture.successes()).is([
-                {call: createPseudoCall("thespian.method", [1]),
-                    returnValue: 456, expectedTimes: 1}
+                {
+                    call: createPseudoCall("thespian.method", [1]),
+                    returnValue: 456, expectedTimes: 1
+                }
             ]);
         });
     });

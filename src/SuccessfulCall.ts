@@ -24,12 +24,13 @@ export class SuccessfulCall {
 
 export class UnsuccessfulCall {
     private constructor(public call: object,
+                        public matchRate: number,
                         public expectedTimes: any,
                         public actualTimes: number) {
     }
 
     describe() {
-        return this;
+        return {call: this.call, expectedTimes: this.expectedTimes, actualTimes: this.actualTimes};
     }
 
     tooManyTimes() {
@@ -37,18 +38,19 @@ export class UnsuccessfulCall {
     }
 
     static make(name: string,
+                matchRate: number,
                 expectedArgs: any,
                 expectedTimes: any,
                 actualTimes: number) {
         return new UnsuccessfulCall(createPseudoCall(name, expectedArgs),
-            expectedTimes, actualTimes);
+            matchRate, expectedTimes, actualTimes);
     }
 
     static makeNearMiss(name: string,
                         matchResult: MatchResult,
                         expectedTimes: any,
                         actualTimes: number) {
-        return new UnsuccessfulCall(createPseudoCall(name, [matchResult]),
+        return new UnsuccessfulCall(createPseudoCall(name, matchResult.diff as Array<any>), matchResult.matchRate,
             expectedTimes, actualTimes);
     }
 }

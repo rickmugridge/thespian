@@ -2,7 +2,7 @@ import {MockedCall} from "./MockedCall";
 import {isSymbol} from "util";
 import {Thespian} from "./Thespian";
 import {PrettyPrinter} from "mismatched";
-import {SuccessfulCall} from "./SuccessfulCall";
+import {SuccessfulCall, UnsuccessfulCall} from "./SuccessfulCall";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
@@ -33,11 +33,16 @@ export class MockHandler implements ProxyHandler<{}> {
             return self.runRightCall(propKey, fullMockName, Array.from(arguments));
         }
 
+        function mismatchedFn() {
+            self.failedToMatch("Unable to handle call, as none defined",
+                fullMockName, Array.from(arguments), []);
+        }
+
         const mockCalls = this.mapMethodToMockCalls.get(propKey);
         if (mockCalls) {
             return returnedFn;
         }
-        self.failedToMatch(fullMockName, [], "Unable to handle call to mock, as none defined");
+        return mismatchedFn;
     }
 
 
@@ -47,30 +52,51 @@ export class MockHandler implements ProxyHandler<{}> {
     }
 
     runRightCall(key: string | number | symbol, mockName: string, actualArguments: Array<any>): any {
+        const nearMisses: Array<UnsuccessfulCall> = [];
         const mockCalls = this.mapMethodToMockCalls.get(key);
         if (mockCalls) {
             for (let call of mockCalls) {
-                const did = call.matchToRunResult(actualArguments); // todo keep the best match in case we fail and show diff for that if reasonable
+                const did = call.matchToRunResult(actualArguments);
                 if (!did.failed) {
                     return did.result;
                 }
+                if (did.failed.matchRate > 0.2) {
+                    nearMisses.push(did.failed);
+                }
             }
         }
-        this.failedToMatch(mockName, actualArguments, "Unable to handle call to mock, as none match");
+        const maxMatchRate = nearMisses.reduce((max, miss) => Math.max(max, miss.matchRate), 0.0);
+        const bestNearMisses = nearMisses.filter(miss => miss.matchRate >= maxMatchRate);
+        const hasTooManyTimes = nearMisses.some(miss => miss.actualTimes > miss.expectedTimes);
+        if (bestNearMisses.length == 1 && hasTooManyTimes) {
+            this.failedToMatch("Unable to handle call, as it's called too many times",
+                mockName, actualArguments, []);
+        } else {
+            const problem = "Unable to handle call, as none match";
+            this.failedToMatch(hasTooManyTimes ? problem + " or it's called too many times" : problem,
+                mockName, actualArguments, bestNearMisses);
+        }
     }
 
-    private failedToMatch(mockName: string, actualArguments: Array<any>, problem: string) {
-        this.error({
+    private failedToMatch(problem: string, mockName: string, actualArguments: Array<any>,
+                          nearMisses: Array<UnsuccessfulCall>) {
+        const msg: any = {
             problem,
             mockCall: {
                 [PrettyPrinter.symbolForPseudoCall]: mockName,
                 args: actualArguments
-            },
-            previousSuccessfulCalls: this.successfulCalls.map(s => s.describe())
-        });
+            }
+        };
+        if (nearMisses.length > 0) {
+            msg.nearMisses = nearMisses.map(s => s.describe());
+        }
+        if (this.successfulCalls.length > 0) {
+            msg.previousSuccessfulCalls = this.successfulCalls.map(s => s.describe());
+        }
+        this.error(msg);
     }
 
-    error(msg: object) {
+    error(msg: any) {
         throw new Error(Thespian.printer.render(msg));
     }
 
