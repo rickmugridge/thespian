@@ -60,21 +60,19 @@ export class MockHandler implements ProxyHandler<{}> {
                 if (!did.failed) {
                     return did.result;
                 }
-                if (did.failed.matchRate > 0.2) {
+                if (did.failed.matchRate >= 0.2) {
                     nearMisses.push(did.failed);
                 }
             }
         }
-        const maxMatchRate = nearMisses.reduce((max, miss) => Math.max(max, miss.matchRate), 0.0);
-        const bestNearMisses = nearMisses.filter(miss => miss.matchRate >= maxMatchRate);
         const hasTooManyTimes = nearMisses.some(miss => miss.actualTimes > miss.expectedTimes);
-        if (bestNearMisses.length == 1 && hasTooManyTimes) {
+        if (nearMisses.length == 1 && hasTooManyTimes) {
             this.failedToMatch("Unable to handle call, as it's called too many times",
                 mockName, actualArguments, []);
         } else {
             const problem = "Unable to handle call, as none match";
             this.failedToMatch(hasTooManyTimes ? problem + " or it's called too many times" : problem,
-                mockName, actualArguments, bestNearMisses);
+                mockName, actualArguments, nearMisses);
         }
     }
 

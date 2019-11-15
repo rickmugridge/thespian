@@ -1,7 +1,7 @@
 {
   "name": "thespian",
-  "version": "0.9.8",
-  "description": "A mocking framework with a sophisticated approach to argument matching. Written in Typescript and respects types in mocks.",
+  "version": "0.9.9",
+  "description": "A mocking framework with a sophisticated approach to argument matching and helpful error messages. Written in Typescript and respects types in mocks.",
   "author": {
     "name": "Rick Mugridge",
     "email": "rick.mugridge@hypr.co.nz"

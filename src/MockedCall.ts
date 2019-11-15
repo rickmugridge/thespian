@@ -62,7 +62,7 @@ export class MockedCall<U> {// where U is the return type
         if (timesIncorrect) {
             // return this.makeNearMiss( // todo Include problem in diff??
             //     new MatchResult(matchResult.diff, matchResult.compares + 1, matchResult.matches));
-            const failed = UnsuccessfulCall.make(this.fullName, matchResult.matchRate, actualArgs,
+            const failed = UnsuccessfulCall.make(this.fullName, 0.2, actualArgs,
                 this.expectedTimes.describe(), this.actualTimes + 1);
             return {failed};
         }

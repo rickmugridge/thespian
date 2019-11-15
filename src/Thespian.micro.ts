@@ -90,7 +90,7 @@ describe("Thespian()", () => {
                 .setup(f => f.foo(2, "aaa"))
                 .returns(() => 44);
             assertThat(mock.object.foo(2, "aaa")).is(44);
-            assertThat(()=>mock.object.foo(2, "aaa")).throwsError(`{
+            assertThat(() => mock.object.foo(2, "aaa")).throwsError(`{
   problem: "Unable to handle call, as it's called too many times", 
   mockCall: anObject.foo(2, "aaa"), 
   previousSuccessfulCalls: [
@@ -102,27 +102,65 @@ describe("Thespian()", () => {
             thespian.verify();
         });
 
-//         it("a method called a second time, exceeding expected times #2", () => {
-//             const thespian = new Thespian();
-//             const mock = thespian.mock<I>("anObject");
-//             mock
-//                 .setup(f => f.foo(2, "aaa"))
-//                 .returns(() => 44);
-//             mock
-//                 .setup(f => f.foo(3, "aaa"))
-//                 .returns(() => 55);
-//             assertThat(mock.object.foo(2, "aaa")).is(44);
-//             assertThat(()=>mock.object.foo(2, "aaa")).throwsError(`{
-//   problem: "Unable to handle call, as it's called too many times",
-//   mockCall: anObject.foo(2, "aaa"),
-//   previousSuccessfulCalls: [
-//     {
-//       call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1
-//     }
-//   ]
-// }`);
-//             thespian.verify();
-//         });
+        it("a method call both exceeds expected time and partially matches another mock call", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.foo(2, "aaa"))
+                .returns(() => 44);
+            mock
+                .setup(f => f.foo(3, "aaa"))
+                .returns(() => 55);
+            assertThat(mock.object.foo(2, "aaa")).is(44);
+            assertThat(() => mock.object.foo(2, "aaa")).throwsError(`{
+  problem: "Unable to handle call, as none match or it's called too many times", 
+  mockCall: anObject.foo(2, "aaa"), 
+  nearMisses: [
+    {
+      call: anObject.foo(2, "aaa"), expectedTimes: 1, actualTimes: 2
+    }, 
+    {
+      call: anObject.foo(
+        {${MatchResult.was}: 2, ${MatchResult.expected}: 3}, "aaa"
+      ), expectedTimes: 1, actualTimes: 0
+    }
+  ], 
+  previousSuccessfulCalls: [
+    {
+      call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1
+    }
+  ]
+}`);
+            // thespian.verify(); Can't verify as we're testing messages from the failure
+        });
+    });
+
+    it("a method call partially matches two separate mock calls", () => {
+        const thespian = new Thespian();
+        const mock = thespian.mock<I>("anObject");
+        mock
+            .setup(f => f.foo(2, "aaa"))
+            .returns(() => 44);
+        mock
+            .setup(f => f.foo(3, "bbb"))
+            .returns(() => 55);
+        assertThat(() => mock.object.foo(3, "aaa")).throwsError(`{
+  problem: "Unable to handle call, as none match", 
+  mockCall: anObject.foo(3, "aaa"), 
+  nearMisses: [
+    {
+      call: anObject.foo(
+        {${MatchResult.was}: 3, ${MatchResult.expected}: 2}, "aaa"
+      ), expectedTimes: 1, actualTimes: 0
+    }, 
+    {
+      call: anObject.foo(
+        3, {${MatchResult.was}: "aaa", ${MatchResult.expected}: "bbb"}
+      ), expectedTimes: 1, actualTimes: 0
+    }
+  ]
+}`);
+        // thespian.verify(); Can't verify as we're testing messages from the failure
     });
 
     describe("function", () => {
@@ -196,7 +234,8 @@ describe("Thespian()", () => {
   )
 }`))
     });
-});
+})
+;
 
 interface I {
     foo(i: number, b: string): number

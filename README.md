@@ -1,7 +1,9 @@
 # thespian
 
-`thespian` is a mocking framework with a sophisticated approach to argument matching.
-Written in Typescript and respects types in mocks.
+`thespian` is a mocking framework with a sophisticated approach to argument matching
+and providing useful error messages.
+
+It is written in Typescript and respects types in mocks.
 
 Thespians are like mocks - they play a role.
 For the "design philosophy" of `thespian`, see below, after the examples.
@@ -36,6 +38,13 @@ Possible `times` checks:
   - `.times()`, a specific `number`
   - `.timesAtLeast()`, the minimum `number` of times
   - `.timesAtMost()`, the macimum `number` of times
+
+# Example Error Message
+
+When a call to a mocked method or function fails to match, it's useful to know whether there were any near misses.
+Here's an example, where there are two near misses:
+
+![message](thespianErrorMessage.png)
 
 # Thespian By Example
 
@@ -257,9 +266,6 @@ But it follows some of syntax of Moq and TypeMoq, but little of the philosophy
  
 # Improvements
 
-  - Improve error message when call a mocked method too many times.
-    Check if it matches before checking times, so can provide as a "close match" near miss.
-  - Provide useful error messages when argument matchers fail but are close. Show near misses.
   - Consider how to specify mocks that could potentially be a Promise, in a Promise chain
    (ie, return undefined for the property "then"). Once object properties are handled, this can be done with:
      - `mockObj.setup(m => b.then).returns(()=> undefined);`
