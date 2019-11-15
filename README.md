@@ -37,7 +37,7 @@ Possible `returns`:
 Possible `times` checks:
   - `.times()`, a specific `number`
   - `.timesAtLeast()`, the minimum `number` of times
-  - `.timesAtMost()`, the macimum `number` of times
+  - `.timesAtMost()`, the maximum `number` of times
 
 # Example Error Message
 
