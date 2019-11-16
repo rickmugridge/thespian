@@ -293,7 +293,9 @@ Here's an example of a function being mocked.
 `Thespian` follows the design decisions of `JMock2` in Java.
 And `mismatched` follows the design decisions of `hamcrest`.
 
-But it follows some of syntax of Moq and TypeMoq, but little of the philosophy
+But it follows some of syntax of Moq and TypeMoq, but little of the philosophy.
+
+See [Common Mocking Anti-Patterns](CommonMockingAntiPatterns.md)
     
 # FAQ
 
