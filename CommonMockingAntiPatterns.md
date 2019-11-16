@@ -95,7 +95,7 @@ The anti-patterns:
 
 # Question
 
-Have I missed any anti-patterns? Why did I not include example? I didn't want to identify specific libraries.
+Have I missed any anti-patterns? Why did I not include examples? I didn't want to identify specific libraries.
 
 # The Result was `thespian`
 
