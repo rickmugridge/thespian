@@ -1,9 +1,7 @@
 import {DiffMatcher, match} from "mismatched";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
-import {RunResult} from "./MockedCall";
 import {UnsuccessfulAccess} from "./UnsuccessfulAccess";
-import {UnsuccessfulCall} from "./UnsuccessfulCall";
 
 export class MockedProperty<U> { // where U is the property type
     private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;
@@ -12,6 +10,7 @@ export class MockedProperty<U> { // where U is the property type
     private returnFn: () => U;
 
     constructor(public fullName: string,
+                public propertyName: string,
                 private successfulCalls: Array<SuccessfulCall>) {
     }
 
@@ -42,13 +41,14 @@ export class MockedProperty<U> { // where U is the property type
         return this;
     }
 
-    run(): AccessResult {
+    access(): AccessResult {
         const timesCorrect = this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         if (timesCorrect) {
             this.actualTimes += 1;
             return {result: this.returnFn()};
         }
-        const failed = UnsuccessfulAccess.make(this.fullName, this.expectedTimes, this.actualTimes + 1);
+        const failed = UnsuccessfulAccess.make(this.fullName, this.expectedTimes.describe(),
+            this.actualTimes + 1);
         return {failed};
     }
 }

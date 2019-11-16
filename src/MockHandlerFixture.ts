@@ -13,7 +13,7 @@ export class MockHandlerFixture {
         const fullName = methodName === "" ? thespian : thespian + "." + methodName;
         const mockedCall = new MockedCall<any>(fullName, methodName,
             expectedArguments, this.successfulCalls);
-        this.handler.add(mockedCall);
+        this.handler.addCall(mockedCall);
         return mockedCall;
     }
 

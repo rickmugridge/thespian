@@ -12,8 +12,6 @@ export class MockedCall<U> { // where U is the return type
     private actualTimes = 0;
     private returnFn: (...args: Array<any>) => U;
 
-    // todo Need to also record the specifics of each matched call to a MockedCall, where times > 1
-
     constructor(public fullName: string,
                 public methodName: string,
                 expectedArguments: Array<any>,

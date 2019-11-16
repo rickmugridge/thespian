@@ -57,8 +57,8 @@ describe("Thespian()", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
             assertThat(() => mock.object.foo(2, "aaa")).throwsError(`{
-  problem: "Unable to handle call, as none defined", 
-  mockCall: anObject.foo(2, "aaa")
+  problem: "Unable to handle call or property, as none defined", 
+  mockCall: anObject.foo()
 }`);
             thespian.verify();
         });
@@ -235,17 +235,69 @@ describe("Thespian()", () => {
         });
     });
 
-    // describe("property", () => {
-    //     it("property accessed once", () => {
-    //         const thespian = new Thespian();
-    //         const mock = thespian.mock<I>("anObject");
-    //         mock
-    //             .setup(f => f.prop)
-    //             .returns(() => 44);
-    //         assertThat(mock.object.prop).is(44);
-    //         thespian.verify();
-    //     });
-    // });
+    describe("property", () => {
+       it("property accessed once", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .returns(() => 44);
+            assertThat(mock.object.prop).is(44);
+            thespian.verify();
+        });
+
+        it("property accessed twice", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .returns(() => 44)
+                .times(2);
+            assertThat(mock.object.prop).is(44);
+            assertThat(mock.object.prop).is(44);
+            thespian.verify();
+        });
+
+        it("property set up and accessed twice", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .returns(() => 44);
+            mock
+                .setup(f => f.prop)
+                .returns(() => 55);
+            assertThat(mock.object.prop).is(44);
+            assertThat(mock.object.prop).is(55);
+            thespian.verify();
+        });
+
+        it("property missing", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            assertThat(()=>mock.object.prop).throwsError(`{
+  problem: "Unable to handle call or property, as none defined", 
+  mockCall: anObject.prop()
+}`);
+            // thespian.verify();
+        });
+
+        it("property unexpectedly accessed twice", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .returns(() => 44);
+            assertThat(mock.object.prop).is(44);
+            assertThat(()=>mock.object.prop).throwsError(`{
+  problem: "Unable to access property", access: anObject.prop(), 
+  tooOften: [
+    {access: anObject.prop(), expectedTimes: 1, actualTimes: 2}
+  ]
+}`);
+            // thespian.verify();
+        });
+    });
 });
 
 interface I {

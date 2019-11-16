@@ -4,19 +4,31 @@ import {Thespian} from "./Thespian";
 import {PrettyPrinter} from "mismatched";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {UnsuccessfulCall} from "./UnsuccessfulCall";
+import {MockedProperty} from "./MockedProperty";
+import {UnsuccessfulAccess} from "./UnsuccessfulAccess";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
+    mapPropertyToFunctions = new Map<PropertyKey, Array<MockedProperty<any>>>();
 
     constructor(private mockName: string, private successfulCalls: Array<SuccessfulCall>) {
     }
 
-    add(mockCall: MockedCall<any>) {
+    addCall(mockCall: MockedCall<any>) {
         const mockCalls = this.mapMethodToMockCalls.get(mockCall.methodName);
         if (!mockCalls) {
             this.mapMethodToMockCalls.set(mockCall.methodName, [mockCall]);
         } else {
             mockCalls.push(mockCall);
+        }
+    }
+
+    addProperty(mockedProperty: MockedProperty<any>) {
+        const mockCalls = this.mapPropertyToFunctions.get(mockedProperty.propertyName);
+        if (!mockCalls) {
+            this.mapPropertyToFunctions.set(mockedProperty.propertyName, [mockedProperty]);
+        } else {
+            mockCalls.push(mockedProperty);
         }
     }
 
@@ -34,15 +46,21 @@ export class MockHandler implements ProxyHandler<{}> {
             return self.runRightCall(propKey, fullMockName, Array.from(arguments));
         }
 
-        function mismatchedFn() {
-            self.failedToMatch("Unable to handle call, as none defined",
+        function mismatchedFn() { // Has to be a function to access arguments
+            self.failedToMatch("Unable to handle call or property, as none defined",
                 fullMockName, Array.from(arguments), []);
+        }
+
+        const propertyAccesses = this.mapPropertyToFunctions.get(propKey);
+        if (propertyAccesses) {
+            return this.accessProperty(propertyAccesses, fullMockName);
         }
 
         if (this.mapMethodToMockCalls.has(propKey)) {
             return returnedFn;
         }
-        return mismatchedFn;
+        // Unfortunately, we can't return the function to get the real args because it may be a property access:
+        return mismatchedFn();
     }
 
 
@@ -51,7 +69,30 @@ export class MockHandler implements ProxyHandler<{}> {
         return this.runRightCall(MockHandler.applyKey, this.mockName, actualArguments);
     }
 
-    runRightCall(key: string | number | symbol, mockName: string, actualArguments: Array<any>): any {
+    private accessProperty(propertyAccesses: Array<MockedProperty<any>>, mockName: string) {
+        const nearMisses: Array<UnsuccessfulAccess> = [];
+        for (let access of propertyAccesses) {
+            const result = access.access();
+            if (result.failed) {
+                nearMisses.push(result.failed);
+            } else {
+                return result.result;
+            }
+        }
+        const msg: any = {
+            problem: "Unable to access property",
+            access: {
+                [PrettyPrinter.symbolForPseudoCall]: mockName,
+                args: []
+            }
+        };
+        if (nearMisses.length > 0) {
+            msg.tooOften = nearMisses;
+        }
+        this.error(msg);
+    }
+
+    private runRightCall(key: string | number | symbol, mockName: string, actualArguments: Array<any>): any {
         const nearMisses: Array<UnsuccessfulCall> = [];
         const mockCalls = this.mapMethodToMockCalls.get(key);
         if (mockCalls) {

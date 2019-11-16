@@ -19,7 +19,7 @@ describe("Mocked:", () => {
                 actualTimes: 0, expectedArgs: {expected: []}
             };
             mockHandler
-                .setup(m => m.add(expected as any))
+                .setup(m => m.addCall(expected as any))
                 .returnsVoid();
             assertThat(mockUnderTest.setup(j => j.f())).is(expected);
         });
@@ -35,14 +35,14 @@ describe("Mocked:", () => {
                 actualTimes: 0, expectedArgs: {expected: []}
             };
             mockHandler
-                .setup(m => m.add(expected as any))
+                .setup(m => m.addCall(expected as any))
                 .returnsVoid();
             assertThat(mockUnderTest.setup(f => f())).is(
                 expected
             );
         });
 
-        it("Is a property", () => {
+        it("Is a property", () => { // todo finish changing this
             const fixture = new MockFixture();
             const {mockUnderTest, mockHandler} = fixture;
             const expected = {
@@ -51,7 +51,7 @@ describe("Mocked:", () => {
                 actualTimes: 0, expectedArgs: {expected: []}
             };
             mockHandler
-                .setup(m => m.add(expected as any))
+                .setup(m => m.addCall(expected as any))
                 .returnsVoid();
             assertThat(mockUnderTest.setup(j => j.f())).is(expected);
         });

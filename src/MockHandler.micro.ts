@@ -13,8 +13,8 @@ describe('MockHandler()', () => {
         const handler = new MockHandler("thespian", []);
         assertThat(() =>
             handler.get(undefined, methodName, undefined)(12)).throwsError(`{
-  problem: "Unable to handle call, as none defined", 
-  mockCall: thespian.method(12)
+  problem: "Unable to handle call or property, as none defined", 
+  mockCall: thespian.method()
 }`);
     });
 
