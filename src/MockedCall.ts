@@ -66,7 +66,7 @@ export class MockedCall<U> { // where U is the return type
         try {
             const result = this.returnFn.apply(undefined, actualArgs);
             this.actualTimes += 1;
-            this.successfulCalls.push(SuccessfulCall.make(this.fullName,
+            this.successfulCalls.push(SuccessfulCall.ofCall(this.fullName,
                 actualArgs, result, this.expectedTimes.describe()));
             return {result};
         } catch (e) {

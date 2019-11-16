@@ -47,7 +47,7 @@ export class MockHandler implements ProxyHandler<{}> {
         }
 
         function mismatchedFn() { // Has to be a function to access arguments
-            self.failedToMatch("Unable to handle call or property, as none defined",
+            self.failedToMatch("Unable to handle call or access property, as none defined",
                 fullMockName, Array.from(arguments), []);
         }
 
@@ -80,11 +80,8 @@ export class MockHandler implements ProxyHandler<{}> {
             }
         }
         const msg: any = {
-            problem: "Unable to access property",
-            access: {
-                [PrettyPrinter.symbolForPseudoCall]: mockName,
-                args: []
-            }
+            problem: "Unable to access",
+            property: {[PrettyPrinter.symbolForPseudoCall]: mockName}
         };
         if (nearMisses.length > 0) {
             msg.tooOften = nearMisses;
@@ -162,6 +159,9 @@ export class MockHandler implements ProxyHandler<{}> {
 
     verify(errors: Array<any>) {
         this.mapMethodToMockCalls.forEach(mockCalls =>
+            mockCalls.filter(m => !m.hasPassed()).forEach(m => errors.push(m.describe()))
+        );
+        this.mapPropertyToFunctions.forEach(mockCalls =>
             mockCalls.filter(m => !m.hasPassed()).forEach(m => errors.push(m.describe()))
         );
     }

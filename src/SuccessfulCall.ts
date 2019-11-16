@@ -12,14 +12,20 @@ export class SuccessfulCall {
         return true;
     }
 
-    static make(name: string,
-                args: Array<any>,
-                returnValue: any,
-                expectedTimes: any) {
+    static ofCall(name: string,
+                  args: Array<any>|undefined,
+                  returnValue: any,
+                  expectedTimes: any) {
         return new SuccessfulCall(createPseudoCall(name, args), returnValue, expectedTimes);
+    }
+
+    static ofProperty(name: string,
+                      returnValue: any,
+                      expectedTimes: any) {
+        return new SuccessfulCall(createPseudoCall(name), returnValue, expectedTimes);
     }
 }
 
-export function createPseudoCall(name: string, args: Array<any>) {
+export function createPseudoCall(name: string, args?: Array<any>) {
     return {[PrettyPrinter.symbolForPseudoCall]: name, args};
 }

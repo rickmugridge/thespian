@@ -1,12 +1,14 @@
 # thespian
 
 `thespian` is a mocking framework with a sophisticated approach to argument matching
-and providing useful error messages.
+and providing useful error messages when arguments fail to match.
 
 It is written in Typescript and respects types in mocks.
+It uses [`mismatched`](https://github.com/rickmugridge/mismatched), 
+a sophisticated composable matcher for matching arguments of method and function calls.
 
 Thespians are like mocks - they play a role.
-For the "design philosophy" of `thespian`, see below, after the examples.
+For the "design decisions" of `thespian`, see below, after the examples.
 
 # Short Docs
 
@@ -14,20 +16,38 @@ For the "design philosophy" of `thespian`, see below, after the examples.
    - `const thespian = new Thespian();`
  - To create a mock for a class or interface (with a given name, used in error messages):
    - `const mockCheck = thespian.mock<Check>("check");`
-    - To specify a mocked method call:
+    - To specify an expected method call:
       - `mockCheck.setup(c => c.match()).returns(() => 4);`
-    - To specify a mocked method call to be called a specific number times:
+    - To specify an expected method call to be called a specific number times:
       - `mockCheck.setup(c => c.match2("target")).returns(() => "ok").times(2);`
+ - To create a mock for an object property (with a given name, used in error messages):
+   - `const mockCheck = thespian.mock<Check>("check");`
+    - To specify an expected property access:
+      - `mockCheck.setup(c => c.prop).returns(() => 4);`
+    - To specify an expected property access to be called a specific number times:
+      - `mockCheck.setup(c => c.prop).returns(() => 5).times(2);`
  - To create a mock for a function:
    - `const mockFn = thespian.mock<(n: number)=>number>("fun");`
-    - To specify a mocked function call:
+    - To specify an expected function call:
       - `mockFn.setup(f => f(5)).returns(() => 2);`
-    - To specify a mocked function call to be called a specific number times:
+    - To specify an expected function call to be called a specific number times:
       - `mockFn.setup(f => f(100)).returns(() => 20).timesGreater(0);`
- - To access the underlying mock for use in tests:
+- To access the underlying mock for use in tests:
    - `const check = mockCheck.object;`
- - To verify that all mock calls have happened:
+ - To verify that all expected mock calls and property accesses have happened:
    - `thespian.verify();`
+   
+Mocked methods and function with the same arguments can return a series of results:
+
+    - To specify a mocked method call with the same arguments but different results (4 is returned in the first call, and 5 on the second):
+      - `mockCheck.setup(c => c.match()).returns(() => 4);`
+      - `mockCheck.setup(c => c.match()).returns(() => 5);`
+    - To specify a mocked property access with different results (4 is returned in the first call, and 5 on the second):
+      - `mockCheck.setup(c => c.prop).returns(() => 4);`
+      - `mockCheck.setup(c => c.prop).returns(() => 5);`
+     - To specify a mocked method function with the same arguments but different results (4 is returned in the first call, and 5 on the second):
+       - `mockCheck.setup(c => f(5)).returns(() => 4);`
+       - `mockCheck.setup(c => f(5)).returns(() => 5);`
 
 Possible `returns`:
   - `.returns(()=>45)`, a function that provides the result. 
@@ -220,6 +240,22 @@ Previous suceeding calls:
 
 This shows that 2 calls were expected but only one was received.
 
+## Mocking an object property access
+
+Here's an example of a property access being mocked.
+
+```
+       it("property accessed once", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .returns(() => 44);
+            assertThat(mock.object.prop).is(44);
+            thespian.verify();
+        });
+```
+
 ## Mocking a function
 
 Here's an example of a function being mocked.
@@ -236,7 +272,6 @@ Here's an example of a function being mocked.
         thespian.describeMocks();
         thespian.verify();
     });
-
 ```
 
 # `thespian` Design Decisions
@@ -260,12 +295,18 @@ And `mismatched` follows the design decisions of `hamcrest`.
 
 But it follows some of syntax of Moq and TypeMoq, but little of the philosophy
     
-# To Do
+# FAQ
 
- - Add support for mocking object properties as well (including `set()`).
- 
-# Improvements
-
-  - Consider how to specify mocks that could potentially be a Promise, in a Promise chain
-   (ie, return undefined for the property "then"). Once object properties are handled, this can be done with:
-     - `mockObj.setup(m => b.then).returns(()=> undefined);`
+  - "I want to match an argument with a complex object structure.
+     But deep within the structure, I want to ignore a randomly-generated value.
+     How can I do that?"
+       - The matcher [`mismatched`](https://github.com/rickmugridge/mismatched) 
+         is used in `thespian` for matching arguments of expected method and 
+         function calls. It provides for such matching. 
+       - For an example, see the section `Mocking with sophisticated argument matching on calls` above.
+  - "I am passing a mock so it ends up being used in a Promise chain.
+     Even though it is not a Promise, it fails when its `.then()` is checked.
+     How can I avoid the failure?"
+     
+      - Simply define a mock on its `then` property to return `undefined`:
+      - `mockObj.setup(m => b.then).returns(()=> undefined);`

@@ -1,8 +1,7 @@
-import {MatchResult} from "mismatched/src/MatchResult";
 import {createPseudoCall} from "./SuccessfulCall";
 
 export class UnsuccessfulAccess {
-    private constructor(public access: object,
+    private constructor(public property: object,
                         public expectedTimes: any,
                         public actualTimes: number) {
     }
@@ -11,9 +10,9 @@ export class UnsuccessfulAccess {
         return this;
     }
 
-    static make(access: string,
+    static make(property: string,
                 expectedTimes: any,
                 actualTimes: number) {
-        return new UnsuccessfulAccess(createPseudoCall(access, []), expectedTimes, actualTimes);
+        return new UnsuccessfulAccess(createPseudoCall(property), expectedTimes, actualTimes);
     }
 }

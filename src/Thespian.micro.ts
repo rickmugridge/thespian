@@ -57,7 +57,7 @@ describe("Thespian()", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
             assertThat(() => mock.object.foo(2, "aaa")).throwsError(`{
-  problem: "Unable to handle call or property, as none defined", 
+  problem: "Unable to handle call or access property, as none defined", 
   mockCall: anObject.foo()
 }`);
             thespian.verify();
@@ -94,9 +94,7 @@ describe("Thespian()", () => {
   problem: "Unable to handle call, as it's called too many times", 
   mockCall: anObject.foo(2, "aaa"), 
   previousSuccessfulCalls: [
-    {
-      call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1
-    }
+    {call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1}
   ]
 }`);
             thespian.verify();
@@ -116,9 +114,7 @@ describe("Thespian()", () => {
   problem: "Unable to handle call, as none match or it's called too many times", 
   mockCall: anObject.foo(2, "aaa"), 
   nearMisses: [
-    {
-      call: anObject.foo(2, "aaa"), expectedTimes: 1, actualTimes: 2
-    }, 
+    {call: anObject.foo(2, "aaa"), expectedTimes: 1, actualTimes: 2}, 
     {
       call: anObject.foo(
         {${MatchResult.was}: 2, ${MatchResult.expected}: 3}, "aaa"
@@ -126,9 +122,7 @@ describe("Thespian()", () => {
     }
   ], 
   previousSuccessfulCalls: [
-    {
-      call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1
-    }
+    {call: anObject.foo(2, "aaa"), returnValue: 44, expectedTimes: 1}
   ]
 }`);
             // thespian.verify(); Can't verify as we're testing messages from the failure
@@ -175,11 +169,9 @@ describe("Thespian()", () => {
             mockJ
                 .setup(g => g.ga(j))
                 .returns(arg => arg);
-            assertThat(() => j.ga(i)).throws(new Error(`{
-  problem: "Unable to handle call, as none match", mockCall: j.ga(
-    {mock: "i"}
-  )
-}`))
+            assertThat(() => j.ga(i)).throws(new Error(`{problem: "Unable to handle call, as none match", mockCall: j.ga(
+  {mock: "i"}
+)}`))
         });
     });
 
@@ -276,7 +268,7 @@ describe("Thespian()", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
             assertThat(()=>mock.object.prop).throwsError(`{
-  problem: "Unable to handle call or property, as none defined", 
+  problem: "Unable to handle call or access property, as none defined", 
   mockCall: anObject.prop()
 }`);
             // thespian.verify();
@@ -290,10 +282,8 @@ describe("Thespian()", () => {
                 .returns(() => 44);
             assertThat(mock.object.prop).is(44);
             assertThat(()=>mock.object.prop).throwsError(`{
-  problem: "Unable to access property", access: anObject.prop(), 
-  tooOften: [
-    {access: anObject.prop(), expectedTimes: 1, actualTimes: 2}
-  ]
+  problem: "Unable to access", property: anObject.prop, 
+  tooOften: [{property: anObject.prop, expectedTimes: 1, actualTimes: 2}]
 }`);
             // thespian.verify();
         });

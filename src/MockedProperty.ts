@@ -46,8 +46,8 @@ export class MockedProperty<U> { // where U is the property type
         if (timesCorrect) {
             const result = this.returnFn();
             this.actualTimes += 1;
-            this.successfulCalls.push(SuccessfulCall.make(this.fullName,
-                [], result, this.expectedTimes.describe()));
+            this.successfulCalls.push(SuccessfulCall.ofProperty(this.fullName, result,
+                this.expectedTimes.describe()));
             return {result};
         }
         const failed = UnsuccessfulAccess.make(this.fullName, this.expectedTimes.describe(),
