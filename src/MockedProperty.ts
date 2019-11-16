@@ -44,12 +44,27 @@ export class MockedProperty<U> { // where U is the property type
     access(): AccessResult {
         const timesCorrect = this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         if (timesCorrect) {
+            const result = this.returnFn();
             this.actualTimes += 1;
-            return {result: this.returnFn()};
+            this.successfulCalls.push(SuccessfulCall.make(this.fullName,
+                [], result, this.expectedTimes.describe()));
+            return {result};
         }
         const failed = UnsuccessfulAccess.make(this.fullName, this.expectedTimes.describe(),
             this.actualTimes + 1);
         return {failed};
+    }
+
+    hasRun(): boolean {
+        return this.actualTimes > 0;
+    }
+
+    hasPassed(): boolean {
+        return this.expectedTimes.matches(this.actualTimes).passed();
+    }
+
+    describe() {
+        return UnsuccessfulAccess.make(this.fullName, 0, this.actualTimes).describe();
     }
 }
 

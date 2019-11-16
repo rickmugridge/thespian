@@ -171,6 +171,9 @@ export class MockHandler implements ProxyHandler<{}> {
         this.mapMethodToMockCalls.forEach(mockCalls =>
             mockCalls.filter(m => m.hasRun()).forEach(m => result.push(m.describe()))
         );
+        this.mapPropertyToFunctions.forEach(mockAccesses =>
+            mockAccesses.filter(m => m.hasRun()).forEach(m => result.push(m.describe()))
+        );
         return result;
     }
 
