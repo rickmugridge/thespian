@@ -2,7 +2,8 @@ import {MockedCall} from "./MockedCall";
 import {isSymbol} from "util";
 import {Thespian} from "./Thespian";
 import {PrettyPrinter} from "mismatched";
-import {SuccessfulCall, UnsuccessfulCall} from "./SuccessfulCall";
+import {SuccessfulCall} from "./SuccessfulCall";
+import {UnsuccessfulCall} from "./UnsuccessfulCall";
 
 export class MockHandler implements ProxyHandler<{}> {
     mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
@@ -29,7 +30,7 @@ export class MockHandler implements ProxyHandler<{}> {
         }
         const fullMockName = `${self.mockName}.${propKey.toString()}`;
 
-        function returnedFn() { // Seems to have to be a function for it to work
+        function returnedFn() { // Has to be a function to access arguments
             return self.runRightCall(propKey, fullMockName, Array.from(arguments));
         }
 
@@ -38,8 +39,7 @@ export class MockHandler implements ProxyHandler<{}> {
                 fullMockName, Array.from(arguments), []);
         }
 
-        const mockCalls = this.mapMethodToMockCalls.get(propKey);
-        if (mockCalls) {
+        if (this.mapMethodToMockCalls.has(propKey)) {
             return returnedFn;
         }
         return mismatchedFn;

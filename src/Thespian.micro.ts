@@ -133,18 +133,17 @@ describe("Thespian()", () => {
 }`);
             // thespian.verify(); Can't verify as we're testing messages from the failure
         });
-    });
 
-    it("a method call partially matches two separate mock calls", () => {
-        const thespian = new Thespian();
-        const mock = thespian.mock<I>("anObject");
-        mock
-            .setup(f => f.foo(2, "aaa"))
-            .returns(() => 44);
-        mock
-            .setup(f => f.foo(3, "bbb"))
-            .returns(() => 55);
-        assertThat(() => mock.object.foo(3, "aaa")).throwsError(`{
+        it("a method call partially matches two separate mock calls", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.foo(2, "aaa"))
+                .returns(() => 44);
+            mock
+                .setup(f => f.foo(3, "bbb"))
+                .returns(() => 55);
+            assertThat(() => mock.object.foo(3, "aaa")).throwsError(`{
   problem: "Unable to handle call, as none match", 
   mockCall: anObject.foo(3, "aaa"), 
   nearMisses: [
@@ -160,7 +159,28 @@ describe("Thespian()", () => {
     }
   ]
 }`);
-        // thespian.verify(); Can't verify as we're testing messages from the failure
+            // thespian.verify(); Can't verify as we're testing messages from the failure
+        });
+
+        it("Mocks are displayed correctly when in mismatched argument list", () => {
+            PrettyPrinter.make(80, 10, Thespian.symbolForMockToString);
+            const thespian = new Thespian();
+            const mockI = thespian.mock<I>("i");
+            mockI
+                .setup(g => g.foo(2, "a"))
+                .returns(() => 33);
+            const i = mockI.object;
+            const mockJ = thespian.mock<J>("j");
+            const j = mockJ.object;
+            mockJ
+                .setup(g => g.ga(j))
+                .returns(arg => arg);
+            assertThat(() => j.ga(i)).throws(new Error(`{
+  problem: "Unable to handle call, as none match", mockCall: j.ga(
+    {mock: "i"}
+  )
+}`))
+        });
     });
 
     describe("function", () => {
@@ -215,29 +235,22 @@ describe("Thespian()", () => {
         });
     });
 
-    it("Mocks are displayed correctly when in mismatched argument list", () => {
-        PrettyPrinter.make(80, 10, Thespian.symbolForMockToString);
-        const thespian = new Thespian();
-        const mockI = thespian.mock<I>("i");
-        mockI
-            .setup(g => g.foo(2, "a"))
-            .returns(() => 33);
-        const i = mockI.object;
-        const mockJ = thespian.mock<J>("j");
-        const j = mockJ.object;
-        mockJ
-            .setup(g => g.ga(j))
-            .returns(arg => arg);
-        assertThat(() => j.ga(i)).throws(new Error(`{
-  problem: "Unable to handle call, as none match", mockCall: j.ga(
-    {mock: "i"}
-  )
-}`))
-    });
-})
-;
+    // describe("property", () => {
+    //     it("property accessed once", () => {
+    //         const thespian = new Thespian();
+    //         const mock = thespian.mock<I>("anObject");
+    //         mock
+    //             .setup(f => f.prop)
+    //             .returns(() => 44);
+    //         assertThat(mock.object.prop).is(44);
+    //         thespian.verify();
+    //     });
+    // });
+});
 
 interface I {
+    prop: number;
+
     foo(i: number, b: string): number
 }
 

@@ -1,7 +1,6 @@
-import {Thespian} from "./Thespian";
 import {Mocked} from "./Mocked";
 import {assertThat} from "mismatched";
-import {MockHandler} from "./MockHandler";
+import {MockFixture} from "./MockFixture";
 
 describe("Mocked:", () => {
     describe("setUp():", () => {
@@ -42,6 +41,21 @@ describe("Mocked:", () => {
                 expected
             );
         });
+
+        it("Is a property", () => {
+            const fixture = new MockFixture();
+            const {mockUnderTest, mockHandler} = fixture;
+            const expected = {
+                fullName: "mockName.f", methodName: "f", successfulCalls: [],
+                expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
+                actualTimes: 0, expectedArgs: {expected: []}
+            };
+            mockHandler
+                .setup(m => m.add(expected as any))
+                .returnsVoid();
+            assertThat(mockUnderTest.setup(j => j.f())).is(expected);
+        });
+
     });
 
     it("verify()", () => {
@@ -64,17 +78,3 @@ describe("Mocked:", () => {
         fixture.verify();
     });
 });
-
-class MockFixture {
-    thespian = new Thespian();
-    mockHandler = this.thespian.mock<MockHandler>("mockHandler");
-    mockUnderTest = new Mocked<J>("mockName", [], this.mockHandler.object);
-
-    verify() {
-        this.thespian.verify();
-    }
-}
-
-interface J {
-    f();
-}

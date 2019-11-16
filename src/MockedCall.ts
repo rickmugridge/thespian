@@ -2,10 +2,11 @@ import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
 import {match, MatchResult} from "mismatched";
 import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {Thespian} from "./Thespian";
-import {SuccessfulCall, UnsuccessfulCall} from "./SuccessfulCall";
+import {SuccessfulCall} from "./SuccessfulCall";
+import {UnsuccessfulCall} from "./UnsuccessfulCall";
 
 // Attached to a Handler - one for each possible call:
-export class MockedCall<U> {// where U is the return type
+export class MockedCall<U> { // where U is the return type
     private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;
     private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
     private actualTimes = 0;
@@ -52,7 +53,7 @@ export class MockedCall<U> {// where U is the return type
         if (!this.returnFn) {
             throw new Error(`A returns() function is needed for mock for "${this.fullName}()"`);
         }
-        // todo Add extra undefined to actualArgs if not long enough
+        // todo Add extra undefined to actualArgs if not long enough??
         const matchResult: MatchResult = this.expectedArgs.matches(actualArgs);
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         const times = (timesIncorrect) ? this.actualTimes + 1 : this.actualTimes;
@@ -60,8 +61,6 @@ export class MockedCall<U> {// where U is the return type
             return this.makeNearMiss(matchResult, times);
         }
         if (timesIncorrect) {
-            // return this.makeNearMiss( // todo Include problem in diff??
-            //     new MatchResult(matchResult.diff, matchResult.compares + 1, matchResult.matches));
             const failed = UnsuccessfulCall.make(this.fullName, 0.2, actualArgs,
                 this.expectedTimes.describe(), this.actualTimes + 1);
             return {failed};
