@@ -102,7 +102,7 @@ Have I missed any anti-patterns? Why did I not include examples? I didn't want t
 `thespian` was designed to avoid all of these anti-patterns.
 
 I wasn't able to find a suitable matching library to use with `thespian`, with decent composabily.
-So I wrote my own: `mismatched`.
+So I wrote my own: [`mismatched`](https://github.com/rickmugridge/mismatched).
 In addition to being an assertion/matching system, `mismatched` includes a `PrettyPrinter` that is used to 
 display JS values (including error messages). This "knows" about `thespian` mocks so can render them helpfully.
 It also allows for `custom rendering`, based on the class of an object (eg, `Moment`).
