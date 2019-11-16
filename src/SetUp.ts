@@ -1,6 +1,3 @@
-import {Optional} from "./Optional";
-import {PrettyPrinter} from "mismatched";
-
 export class SetUp {
     static details<T, U>(f: (t: T) => U): SetUpDetails {
         const fn = f.toString(); // Eg, 'f => f.foooo(2, "aaa")'
