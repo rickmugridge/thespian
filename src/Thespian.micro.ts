@@ -74,9 +74,8 @@ describe("Thespian()", () => {
   mockCall: anObject.foo(4, "aaa"), 
   nearMisses: [
     {
-      call: anObject.foo(
-        {${MatchResult.was}: 4, ${MatchResult.expected}: 2}, "aaa"
-      ), expectedTimes: 1, actualTimes: 0
+      call: anObject.foo({${MatchResult.was}: 4, ${MatchResult.expected}: 2}, "aaa"), 
+      expectedTimes: 1, actualTimes: 0
     }
   ]
 }`);
@@ -116,9 +115,8 @@ describe("Thespian()", () => {
   nearMisses: [
     {call: anObject.foo(2, "aaa"), expectedTimes: 1, actualTimes: 2}, 
     {
-      call: anObject.foo(
-        {${MatchResult.was}: 2, ${MatchResult.expected}: 3}, "aaa"
-      ), expectedTimes: 1, actualTimes: 0
+      call: anObject.foo({${MatchResult.was}: 2, ${MatchResult.expected}: 3}, "aaa"), 
+      expectedTimes: 1, actualTimes: 0
     }
   ], 
   previousSuccessfulCalls: [
@@ -142,14 +140,13 @@ describe("Thespian()", () => {
   mockCall: anObject.foo(3, "aaa"), 
   nearMisses: [
     {
-      call: anObject.foo(
-        {${MatchResult.was}: 3, ${MatchResult.expected}: 2}, "aaa"
-      ), expectedTimes: 1, actualTimes: 0
+      call: anObject.foo({${MatchResult.was}: 3, ${MatchResult.expected}: 2}, "aaa"), 
+      expectedTimes: 1, actualTimes: 0
     }, 
     {
-      call: anObject.foo(
-        3, {${MatchResult.was}: "aaa", ${MatchResult.expected}: "bbb"}
-      ), expectedTimes: 1, actualTimes: 0
+      call: 
+      anObject.foo(3, {${MatchResult.was}: "aaa", ${MatchResult.expected}: "bbb"}), 
+      expectedTimes: 1, actualTimes: 0
     }
   ]
 }`);
@@ -169,9 +166,7 @@ describe("Thespian()", () => {
             mockJ
                 .setup(g => g.ga(j))
                 .returns(arg => arg);
-            assertThat(() => j.ga(i)).throws(new Error(`{problem: "Unable to handle call, as none match", mockCall: j.ga(
-  {mock: "i"}
-)}`))
+            assertThat(() => j.ga(i)).throws(new Error(`{problem: "Unable to handle call, as none match", mockCall: j.ga({mock: "i"})}`))
         });
     });
 
