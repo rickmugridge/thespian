@@ -4,7 +4,7 @@ import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {ofType} from "mismatched/dist/src/ofType";
 import {TMocked} from "./TMocked";
 import {SuccessfulCall} from "./SuccessfulCall";
-import {SetUp, SetUpDetails, SetUpType} from "./SetUp";
+import {DefinedSetUp, SetUpDetails, SetUpType} from "./DefinedSetUp";
 import {MockedProperty} from "./MockedProperty";
 
 let expectedArgs;
@@ -23,7 +23,7 @@ export class Mocked<T> implements TMocked<T> { // One for each mocked object and
         if (!ofType.isFunction(f)) {
             throw new Error("An arrow/function must be provided in setup()");
         }
-        const setUpDetails = SetUp.details(f);
+        const setUpDetails = DefinedSetUp.details(f);
         switch (setUpDetails._type) {
             case SetUpType.Property:
                 return this.setUpPropertyAccess<U>(f, setUpDetails);

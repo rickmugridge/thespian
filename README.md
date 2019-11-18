@@ -312,3 +312,5 @@ See [Common Mocking Anti-Patterns](CommonMockingAntiPatterns.md)
      
       - Simply define a mock on its `then` property to return `undefined`:
       - `mockObj.setup(m => b.then).returns(()=> undefined);`
+  - "What's a good way of checking that a method correctly returns a rejected Promise?"
+      - See [Testing Returned Promise Is Rejected](TestingPromiseIsRejected.md)

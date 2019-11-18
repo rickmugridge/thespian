@@ -1,4 +1,4 @@
-export class SetUp {
+export class DefinedSetUp {
     static details<T, U>(f: (t: T) => U): SetUpDetails {
         const fn = f.toString(); // Eg, 'f => f.foooo(2, "aaa")'
         const split = fn.split(" => "); // Eg, ['f', 'f.foooo(2, "aaa")'
