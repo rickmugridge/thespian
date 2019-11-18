@@ -47,6 +47,7 @@ This will then result in a failed test.
 
 ```
            return assertThat(handleError(44, repo.object, handler.object))
-                .catches("whoops");
+                .catches("whoops")
+                .then(()=> thespian.verify());
 ```
 
