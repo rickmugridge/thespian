@@ -2,8 +2,10 @@
 
 # Rick Mugridge, Hypr, 17 November 2019
 
-I've used a variety of existing mocking frameworks in Typescript development ove the last 4 years.
-These all suffered from one or more problems, especially when mocking where:
+I've used a variety of existing mocking frameworks in Typescript development over the last 4 years.
+Most are fine for very simple testing, with simple objects/arrays.
+
+But these all suffered from one or more problems, when mocking where:
 
  - Several mocks are needed, when test driving a class that plays a coordination role and has several dependencies
    injected into that class.
@@ -58,7 +60,10 @@ The anti-patterns:
  - Consider when an argument of a mocked call is a complex, nested object/array.
  - The difference between the expected and actual argument may be slight.
  - But it takes some time to work out the difference between the (JSON) display of each.
- - A diff would be so handy.
+ - With such limited information, it makes sense to check the various parts of a complex object.
+   Otherwise, it's very hard to identify and understand the differences.
+ - A diff would be so handy. 
+   Then we can check large complex objects and see what bits are wrong really easily.
  
 ## 4. Mocks are not identified in error messages 
 
