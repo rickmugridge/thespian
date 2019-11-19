@@ -60,8 +60,9 @@ The anti-patterns:
  - Consider when an argument of a mocked call is a complex, nested object/array.
  - The difference between the expected and actual argument may be slight.
  - But it takes some time to work out the difference between the (JSON) display of each.
- - With such limited information, it makes sense to check the various parts of a complex object.
+ - With such limited information, it makes sense to check the various parts of a complex object or array.
    Otherwise, it's very hard to identify and understand the differences.
+   But this can mean that we miss changes in the actual data that are additions to the ones we've checked.
  - A diff would be so handy. 
    Then we can check large complex objects and see what bits are wrong really easily.
  
