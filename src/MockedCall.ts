@@ -10,7 +10,7 @@ export class MockedCall<U> { // where U is the return type
     private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;
     private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
     private actualTimes = 0;
-    private returnFn: (...args: Array<any>) => U;
+    private returnFn: (...args: Array<any>) => U = () => undefined as any as U;
 
     constructor(public fullName: string,
                 public methodName: string,
@@ -25,7 +25,6 @@ export class MockedCall<U> { // where U is the return type
     }
 
     returnsVoid(): this {
-        this.returnFn = (...args: Array<any>) => undefined as any as U;
         return this;
     }
 
@@ -48,9 +47,6 @@ export class MockedCall<U> { // where U is the return type
     }
 
     matchToRunResult(actualArgs: Array<any>): RunResult {
-        if (!this.returnFn) {
-            throw new Error(`A returns() function is needed for mock for "${this.fullName}()"`);
-        }
         // todo Add extra undefined to actualArgs if not long enough??
         const matchResult: MatchResult = this.expectedArgs.matches(actualArgs);
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();

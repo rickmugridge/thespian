@@ -47,7 +47,7 @@ export class MockHandler implements ProxyHandler<{}> {
         }
 
         function mismatchedFn() { // Has to be a function to access arguments
-            self.failedToMatch("Unable to handle call or access property, as none defined",
+            self.failedToMatch("Unable to handle call or access property, as it has not been mocked",
                 fullMockName, Array.from(arguments), []);
         }
 

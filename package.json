@@ -1,6 +1,6 @@
 {
   "name": "thespian",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "A mocking framework with a sophisticated approach to argument matching and helpful error messages when arguments fail to match. Written in Typescript and respects types in mocks.",
   "author": {
     "name": "Rick Mugridge",

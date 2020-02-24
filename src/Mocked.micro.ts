@@ -1,5 +1,5 @@
 import {Mocked} from "./Mocked";
-import {assertThat} from "mismatched";
+import {assertThat, match} from "mismatched";
 import {MockFixture} from "./MockFixture";
 
 describe("Mocked:", () => {
@@ -16,7 +16,7 @@ describe("Mocked:", () => {
             const expected = {
                 fullName: "mockName.f", methodName: "f", successfulCalls: [],
                 expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
-                actualTimes: 0, expectedArgs: {expected: []}
+                actualTimes: 0, expectedArgs: {expected: []}, returnFn: match.any()
             };
             mockHandler
                 .setup(m => m.addCall(expected as any))
@@ -32,7 +32,7 @@ describe("Mocked:", () => {
             const expected = {
                 fullName: "mockFnName", methodName: "", successfulCalls: [],
                 expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
-                actualTimes: 0, expectedArgs: {expected: []}
+                actualTimes: 0, expectedArgs: {expected: []}, returnFn: match.any()
             };
             mockHandler
                 .setup(m => m.addCall(expected as any))
@@ -48,7 +48,7 @@ describe("Mocked:", () => {
             const expected = {
                 fullName: "mockName.f", methodName: "f", successfulCalls: [],
                 expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
-                actualTimes: 0, expectedArgs: {expected: []}
+                actualTimes: 0, expectedArgs: {expected: []}, returnFn: match.any()
             };
             mockHandler
                 .setup(m => m.addCall(expected as any))

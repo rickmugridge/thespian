@@ -57,7 +57,7 @@ describe("Thespian()", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
             assertThat(() => mock.object.foo(2, "aaa")).throwsError(`{
-  problem: "Unable to handle call or access property, as none defined", 
+  problem: "Unable to handle call or access property, as it has not been mocked", 
   mockCall: anObject.foo()
 }`);
             thespian.verify();
@@ -164,7 +164,7 @@ describe("Thespian()", () => {
             const mockJ = thespian.mock<J>("j");
             const j = mockJ.object;
             mockJ
-                .setup(g => g.ga(j))
+                .setup(g => (g as any).ga(j))
                 .returns(arg => arg);
             assertThat(() => j.ga(i)).throws(new Error(`{problem: "Unable to handle call, as none match", mockCall: j.ga({mock: "i"})}`))
         });
@@ -263,7 +263,7 @@ describe("Thespian()", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
             assertThat(()=>mock.object.prop).throwsError(`{
-  problem: "Unable to handle call or access property, as none defined", 
+  problem: "Unable to handle call or access property, as it has not been mocked", 
   mockCall: anObject.prop()
 }`);
             // thespian.verify();
