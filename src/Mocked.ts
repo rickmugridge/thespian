@@ -1,11 +1,11 @@
 import {MockedCall} from "./MockedCall";
 import {MockHandler} from "./MockHandler";
-import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {ofType} from "mismatched/dist/src/ofType";
 import {TMocked} from "./TMocked";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {DefinedSetUp, SetUpDetails, SetUpType} from "./DefinedSetUp";
 import {MockedProperty} from "./MockedProperty";
+import {matchMaker} from "mismatched/dist/src/matchMaker/matchMaker";
 
 let expectedArgs;
 

@@ -1,7 +1,7 @@
 import {DiffMatcher, match} from "mismatched";
 import {SuccessfulCall} from "./SuccessfulCall";
-import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {UnsuccessfulAccess} from "./UnsuccessfulAccess";
+import {matchMaker} from "mismatched/dist/src/matchMaker/matchMaker";
 
 export class MockedProperty<U> { // where U is the property type
     private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;

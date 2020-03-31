@@ -1,9 +1,9 @@
 import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
 import {match, MatchResult} from "mismatched";
-import {matchMaker} from "mismatched/dist/src/matcher/matchMaker";
 import {Thespian} from "./Thespian";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {UnsuccessfulCall} from "./UnsuccessfulCall";
+import {matchMaker} from "mismatched/dist/src/matchMaker/matchMaker";
 
 // Attached to a Handler - one for each possible call:
 export class MockedCall<U> { // where U is the return type
