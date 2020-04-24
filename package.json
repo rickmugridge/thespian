@@ -1,6 +1,6 @@
 {
   "name": "thespian",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "A mocking framework with a sophisticated approach to argument matching and helpful error messages when arguments fail to match. Written in Typescript and respects types in mocks.",
   "author": {
     "name": "Rick Mugridge",
@@ -31,7 +31,7 @@
     "@types/node": "~9.4.6",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.2",
-    "mismatched": "2.1.2",
+    "mismatched": "2.1.3",
     "ts-node": "^6.2.0",
     "typescript": "3.5.2"
   }
