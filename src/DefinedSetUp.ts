@@ -3,16 +3,16 @@ export class DefinedSetUp {
         const fn = f.toString(); // Eg, 'f => f.foooo(2, "aaa")'
         const split = fn.split(" => "); // Eg, ['f', 'f.foooo(2, "aaa")'
         const call = split[1]; // eg, 'f.foooo(2, "aaa")'
+        const openBracket = call.indexOf("(");
         const dot = call.indexOf(".");
-        if (dot < 0) {
+        if (openBracket < 0) {
+            return {_type: SetUpType.Property, name: call.slice(dot + 1)};
+        }
+        if (dot < 0 || dot > openBracket) { // Eg, (j: any) => j(match.any())
             return {_type: SetUpType.Function}; // a function
         }
-        const openBracket = call.indexOf("(");
-        if (openBracket >= 0) {
-            const name = call.slice(dot + 1, openBracket);
-            return {_type: SetUpType.Method, name: name};
-        }
-        return {_type: SetUpType.Property, name: call.slice(dot + 1)};
+        const name = call.slice(dot + 1, openBracket);
+        return {_type: SetUpType.Method, name: name};
     }
 }
 
