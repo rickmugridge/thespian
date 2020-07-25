@@ -36,7 +36,7 @@ export class MockedCall<U> { // where U is the return type
 
     timesAtLeast(count: number): this {
         this.expectedTimes = match.number.greaterEqual(count);
-        this.expectedTimesInProgress = match.number.greaterEqual(count);
+        this.expectedTimesInProgress = match.number.greaterEqual(1);
         return this;
     }
 

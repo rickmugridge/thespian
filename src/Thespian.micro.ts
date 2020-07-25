@@ -25,6 +25,30 @@ describe("Thespian()", () => {
             thespian.verify();
         });
 
+        it("a method called twice with same arguments and same result (timesAtLeast)", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("an object");
+            mock
+                .setup(f => f.foo(2, "aaa"))
+                .returns(() => 44)
+                .timesAtLeast(1);
+            assertThat(mock.object.foo(2, "aaa")).is(44);
+            assertThat(mock.object.foo(2, "aaa")).is(44);
+            thespian.verify();
+        });
+
+        it("a method called twice with same arguments and same result (timesAtMost)", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("an object");
+            mock
+                .setup(f => f.foo(2, "aaa"))
+                .returns(() => 44)
+                .timesAtMost(2);
+            assertThat(mock.object.foo(2, "aaa")).is(44);
+            assertThat(mock.object.foo(2, "aaa")).is(44);
+            thespian.verify();
+        });
+
         it("a method called twice with same arguments", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("an object");
@@ -188,6 +212,30 @@ describe("Thespian()", () => {
                 .setup(g => g(2))
                 .returns(() => 33)
                 .times(2);
+            assertThat(mock.object(2)).is(33);
+            assertThat(mock.object(2)).is(33);
+            thespian.verify();
+        });
+
+       it("function called twice with same arguments and same result (timesAtLeast)", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<(i: number) => number>("fn");
+            mock
+                .setup(g => g(2))
+                .returns(() => 33)
+                .timesAtLeast(2);
+            assertThat(mock.object(2)).is(33);
+            assertThat(mock.object(2)).is(33);
+            thespian.verify();
+        });
+
+       it("function called twice with same arguments and same result (timesAtMost)", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<(i: number) => number>("fn");
+            mock
+                .setup(g => g(2))
+                .returns(() => 33)
+                .timesAtMost(2);
             assertThat(mock.object(2)).is(33);
             assertThat(mock.object(2)).is(33);
             thespian.verify();
