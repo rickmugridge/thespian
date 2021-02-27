@@ -28,7 +28,7 @@ describe('MockHandler()', () => {
             assertThat(fixture.successes()).is([{
                 call: createPseudoCall("thespian.method", [5]),
                 returnValue: 5, expectedTimes: 1
-            }]);
+            } as any]);
         });
 
         it("Call known method with a single MockedCall, with specified result", () => {
@@ -40,7 +40,7 @@ describe('MockHandler()', () => {
             assertThat(fixture.successes()).is([{
                 call: createPseudoCall("thespian.method", [1]),
                 returnValue: 456, expectedTimes: 1
-            }]);
+            } as any]);
         });
 
         it("Call known method with a single MockedCall, but doesn't match", () => {
@@ -62,8 +62,8 @@ describe('MockHandler()', () => {
             assertThat(fn(1, 2)).is(456);
             assertThat(fn(2, 3)).is(789);
             assertThat(fixture.successes()).is([
-                {call: createPseudoCall("thespian.method", [1, 2]), returnValue: 456, expectedTimes: 1},
-                {call: createPseudoCall("thespian.method", [2, 3]), returnValue: 789, expectedTimes: 1}
+                {call: createPseudoCall("thespian.method", [1, 2]), returnValue: 456, expectedTimes: 1} as any,
+                {call: createPseudoCall("thespian.method", [2, 3]), returnValue: 789, expectedTimes: 1} as any
             ]);
         });
     });
@@ -88,7 +88,7 @@ describe('MockHandler()', () => {
                 {
                     call: createPseudoCall("thespian.method", [1]),
                     returnValue: 456, expectedTimes: 1
-                }
+                } as any
             ]);
         });
     });

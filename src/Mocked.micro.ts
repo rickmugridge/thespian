@@ -21,7 +21,7 @@ describe("Mocked:", () => {
             mockHandler
                 .setup(m => m.addCall(expected as any))
                 .returnsVoid();
-            assertThat(mockUnderTest.setup(j => j.f())).is(expected);
+            assertThat(mockUnderTest.setup(j => j.f())).is(expected as any);
         });
 
         it("Is a function", () => {
@@ -37,9 +37,7 @@ describe("Mocked:", () => {
             mockHandler
                 .setup(m => m.addCall(expected as any))
                 .returnsVoid();
-            assertThat(mockUnderTest.setup(f => f())).is(
-                expected
-            );
+            assertThat(mockUnderTest.setup(f => f())).is(expected as any);
         });
 
         it("Is a property", () => { // todo finish changing this
@@ -53,7 +51,7 @@ describe("Mocked:", () => {
             mockHandler
                 .setup(m => m.addCall(expected as any))
                 .returnsVoid();
-            assertThat(mockUnderTest.setup(j => j.f())).is(expected);
+            assertThat(mockUnderTest.setup(j => j.f())).is(expected as any);
         });
 
     });

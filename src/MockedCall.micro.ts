@@ -88,10 +88,11 @@ describe("MockedCall()", () => {
                 call: createPseudoCall("thespian.m", [7]),
                 actualTimes: 1, expectedTimes: 1
             });
-            assertThat(successfulCalls).is([{
-                call: createPseudoCall("thespian.m", [7]),
-                returnValue: 3, expectedTimes: 1
-            }
+            assertThat(successfulCalls).is([
+                {
+                    call: createPseudoCall("thespian.m", [7]),
+                    returnValue: 3, expectedTimes: 1
+                } as any
             ]);
         });
     });
