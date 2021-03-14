@@ -1,13 +1,16 @@
 import {MockedCall} from "./MockedCall";
-import {isSymbol} from "util";
 import {Thespian} from "./Thespian";
 import {PrettyPrinter} from "mismatched";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {UnsuccessfulCall} from "./UnsuccessfulCall";
 import {MockedProperty} from "./MockedProperty";
 import {UnsuccessfulAccess} from "./UnsuccessfulAccess";
+import {ofType} from "mismatched/dist/src/ofType";
+
+export const minimumMatchRateForNearMiss = 0.2
 
 export class MockHandler implements ProxyHandler<{}> {
+    static applyKey = "";
     mapMethodToMockCalls = new Map<PropertyKey, Array<MockedCall<any>>>();
     mapPropertyToFunctions = new Map<PropertyKey, Array<MockedProperty<any>>>();
 
@@ -37,7 +40,7 @@ export class MockHandler implements ProxyHandler<{}> {
         if (propKey === Thespian.symbolForMockToString) {
             return () => self.mockName;
         }
-        if (isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
+        if (ofType.isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
             return undefined;
         }
         const fullMockName = `${self.mockName}.${propKey.toString()}`;
@@ -63,73 +66,9 @@ export class MockHandler implements ProxyHandler<{}> {
         return mismatchedFn();
     }
 
-
     // Called by apply() and call().
     apply(target, thisArg, actualArguments: Array<any>) {
         return this.runRightCall(MockHandler.applyKey, this.mockName, actualArguments);
-    }
-
-    private accessProperty(propertyAccesses: Array<MockedProperty<any>>, mockName: string) {
-        const nearMisses: Array<UnsuccessfulAccess> = [];
-        for (let access of propertyAccesses) {
-            const result = access.access();
-            if (result.failed) {
-                nearMisses.push(result.failed);
-            } else {
-                return result.result;
-            }
-        }
-        const msg: any = {
-            problem: "Unable to access",
-            property: {[PrettyPrinter.symbolForPseudoCall]: mockName}
-        };
-        if (nearMisses.length > 0) {
-            msg.tooOften = nearMisses;
-        }
-        this.error(msg);
-    }
-
-    private runRightCall(key: string | number | symbol, mockName: string, actualArguments: Array<any>): any {
-        const nearMisses: Array<UnsuccessfulCall> = [];
-        const mockCalls = this.mapMethodToMockCalls.get(key);
-        if (mockCalls) {
-            for (let call of mockCalls) {
-                const did = call.matchToRunResult(actualArguments);
-                if (!did.failed) {
-                    return did.result;
-                }
-                if (did.failed.matchRate >= 0.2) {
-                    nearMisses.push(did.failed);
-                }
-            }
-        }
-        const hasTooManyTimes = nearMisses.some(miss => miss.actualTimes > miss.expectedTimes);
-        if (nearMisses.length == 1 && hasTooManyTimes) {
-            this.failedToMatch("Unable to handle call, as it's called too many times",
-                mockName, actualArguments, []);
-        } else {
-            const problem = "Unable to handle call, as none match";
-            this.failedToMatch(hasTooManyTimes ? problem + " or it's called too many times" : problem,
-                mockName, actualArguments, nearMisses);
-        }
-    }
-
-    private failedToMatch(problem: string, mockName: string, actualArguments: Array<any>,
-                          nearMisses: Array<UnsuccessfulCall>) {
-        const msg: any = {
-            problem,
-            mockCall: {
-                [PrettyPrinter.symbolForPseudoCall]: mockName,
-                args: actualArguments
-            }
-        };
-        if (nearMisses.length > 0) {
-            msg.nearMisses = nearMisses.map(s => s.describe());
-        }
-        if (this.successfulCalls.length > 0) {
-            msg.previousSuccessfulCalls = this.successfulCalls.map(s => s.describe());
-        }
-        this.error(msg);
     }
 
     error(msg: any) {
@@ -177,5 +116,66 @@ export class MockHandler implements ProxyHandler<{}> {
         return result;
     }
 
-    static applyKey = "";
+    private accessProperty(propertyAccesses: Array<MockedProperty<any>>, mockName: string) {
+        const nearMisses: Array<UnsuccessfulAccess> = [];
+        for (let access of propertyAccesses) {
+            const result = access.access();
+            if (result.failed) {
+                nearMisses.push(result.failed);
+            } else {
+                return result.result;
+            }
+        }
+        const msg: any = {
+            problem: "Unable to access",
+            property: {[PrettyPrinter.symbolForPseudoCall]: mockName}
+        };
+        if (nearMisses.length > 0) {
+            msg.tooOften = nearMisses;
+        }
+        this.error(msg);
+    }
+
+    private runRightCall(key: string | number | symbol, mockName: string, actualArguments: Array<any>): any {
+        const nearMisses: Array<UnsuccessfulCall> = [];
+        const mockCalls = this.mapMethodToMockCalls.get(key);
+        if (mockCalls) {
+            for (let call of mockCalls) {
+                const did = call.matchToRunResult(actualArguments);
+                if (!did.failed) {
+                    return did.result;
+                }
+                if (did.failed.matchRate >= minimumMatchRateForNearMiss) {
+                    nearMisses.push(did.failed);
+                }
+            }
+        }
+        const hasTooManyTimes = nearMisses.some(miss => miss.actualTimes > miss.expectedTimes);
+        if (nearMisses.length == 1 && hasTooManyTimes) {
+            this.failedToMatch("Unable to handle call, as it's called too many times",
+                mockName, actualArguments, []);
+        } else {
+            const problem = "Unable to handle call, as none match";
+            this.failedToMatch(hasTooManyTimes ? problem + " or it's called too many times" : problem,
+                mockName, actualArguments, nearMisses);
+        }
+    }
+
+    private failedToMatch(problem: string, mockName: string, actualArguments: Array<any>,
+                          nearMisses: Array<UnsuccessfulCall>) {
+        const msg: any = {
+            problem,
+            mockCall: {
+                [PrettyPrinter.symbolForPseudoCall]: mockName,
+                args: actualArguments
+            }
+        };
+        if (nearMisses.length > 0) {
+            msg.nearMisses = nearMisses.map(s => s.describe());
+        }
+        if (this.successfulCalls.length > 0) {
+            msg.previousSuccessfulCalls = this.successfulCalls.map(s => s.describe());
+        }
+        this.error(msg);
+    }
 }

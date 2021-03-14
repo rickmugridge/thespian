@@ -106,6 +106,24 @@ describe("Thespian()", () => {
             // thespian.verify(); Don't verify
         });
 
+        it("method called but arguments are not the same length", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.goo(1, 2, 3))
+                .returns(() => 44);
+            assertThat(() => (mock.object as any).goo(1, 2)).throwsError(`{
+  problem: "Unable to handle call, as none match", mockCall: anObject.goo(1, 2), 
+  nearMisses: [
+    {
+      call: anObject.goo(1, 2, {${MatchResult.expected}: 3}), expectedTimes: 1, 
+      actualTimes: 0
+    }
+  ]
+}`);
+            // thespian.verify(); Don't verify
+        });
+
         it("a method called a second time, exceeding expected times", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
@@ -217,7 +235,7 @@ describe("Thespian()", () => {
             thespian.verify();
         });
 
-       it("function called twice with same arguments and same result (timesAtLeast)", () => {
+        it("function called twice with same arguments and same result (timesAtLeast)", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<(i: number) => number>("fn");
             mock
@@ -229,7 +247,7 @@ describe("Thespian()", () => {
             thespian.verify();
         });
 
-       it("function called twice with same arguments and same result (timesAtMost)", () => {
+        it("function called twice with same arguments and same result (timesAtMost)", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<(i: number) => number>("fn");
             mock
@@ -271,7 +289,7 @@ describe("Thespian()", () => {
     });
 
     describe("property", () => {
-       it("property accessed once", () => {
+        it("property accessed once", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
             mock
@@ -310,7 +328,7 @@ describe("Thespian()", () => {
         it("property missing", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
-            assertThat(()=>mock.object.prop).throwsError(`{
+            assertThat(() => mock.object.prop).throwsError(`{
   problem: "Unable to handle call or access property, as it has not been mocked", 
   mockCall: anObject.prop()
 }`);
@@ -324,7 +342,7 @@ describe("Thespian()", () => {
                 .setup(f => f.prop)
                 .returns(() => 44);
             assertThat(mock.object.prop).is(44);
-            assertThat(()=>mock.object.prop).throwsError(`{
+            assertThat(() => mock.object.prop).throwsError(`{
   problem: "Unable to access", property: anObject.prop, 
   tooOften: [{property: anObject.prop, expectedTimes: 1, actualTimes: 2}]
 }`);
@@ -337,6 +355,8 @@ interface I {
     prop: number;
 
     foo(i: number, b: string): number
+
+    goo(i: number, j: number, k: number): number
 }
 
 interface J {

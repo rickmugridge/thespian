@@ -4,6 +4,7 @@ import {Thespian} from "./Thespian";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {UnsuccessfulCall} from "./UnsuccessfulCall";
 import {matchMaker} from "mismatched/dist/src/matchMaker/matchMaker";
+import {minimumMatchRateForNearMiss} from "./MockHandler";
 
 // Attached to a Handler - one for each possible call:
 export class MockedCall<U> { // where U is the return type
@@ -55,7 +56,7 @@ export class MockedCall<U> { // where U is the return type
             return this.makeNearMiss(matchResult, times);
         }
         if (timesIncorrect) {
-            const failed = UnsuccessfulCall.make(this.fullName, 0.2, actualArgs,
+            const failed = UnsuccessfulCall.make(this.fullName, minimumMatchRateForNearMiss, actualArgs,
                 this.expectedTimes.describe(), this.actualTimes + 1);
             return {failed};
         }

@@ -1,4 +1,4 @@
-import {assertThat} from "mismatched";
+import {assertThat, MatchResult, PrettyPrinter} from "mismatched";
 import {createPseudoCall, SuccessfulCall} from "./SuccessfulCall";
 import {MockedCall} from "./MockedCall";
 
@@ -67,7 +67,27 @@ describe("MockedCall()", () => {
         it("Fails as args don't match due to length difference", () => {
             const mockedCall = new MockedCall("thespian.m", "m", [5], [])
                 .returns(f);
-            assertThat(mockedCall.matchToRunResult([]).failed).isNot(undefined);
+            const result = mockedCall.matchToRunResult([]);
+            assertThat(result.failed).isNot(undefined);
+            assertThat(PrettyPrinter.make().render(result)).is(`{
+  failed: {
+    call: thespian.m({${[MatchResult.expected]}: 5}), matchRate: 0, expectedTimes: 1, 
+    actualTimes: 0
+  }
+}`);
+        });
+
+        it("Fails as args don't match due to smaller length difference", () => {
+            const mockedCall = new MockedCall("thespian.m", "m", [5, 6, 7, 8], [])
+                .returns(f);
+            const result = mockedCall.matchToRunResult([5, 6]);
+            assertThat(result.failed).isNot(undefined);
+            assertThat(PrettyPrinter.make().render(result)).is(`{
+  failed: {
+    call: thespian.m(5, 6, {${[MatchResult.expected]}: 7}, {${[MatchResult.expected]}: 8}), 
+    matchRate: 0.5, expectedTimes: 1, actualTimes: 0
+  }
+}`);
         });
 
         it("Fails as args don't match due to args difference", () => {
