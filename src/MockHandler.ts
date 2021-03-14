@@ -89,7 +89,7 @@ export class MockHandler implements ProxyHandler<{}> {
     }
 
     getOwnPropertyDescriptor(target, prop: string | number | symbol): PropertyDescriptor | undefined {
-        try {// todo check results here
+        try {
             return {configurable: true, enumerable: true, value: this.get(target, prop, undefined)};
         } catch (e) {
             return undefined;

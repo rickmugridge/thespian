@@ -40,7 +40,7 @@ describe("Mocked:", () => {
             assertThat(mockUnderTest.setup(f => f())).is(expected as any);
         });
 
-        it("Is a property", () => { // todo finish changing this
+        it("Is a property", () => {
             const fixture = new MockFixture();
             const {mockUnderTest, mockHandler} = fixture;
             const expected = {

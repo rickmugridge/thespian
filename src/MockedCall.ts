@@ -48,7 +48,6 @@ export class MockedCall<U> { // where U is the return type
     }
 
     matchToRunResult(actualArgs: Array<any>): RunResult {
-        // todo Add extra undefined to actualArgs if not long enough??
         const matchResult: MatchResult = this.expectedArgs.matches(actualArgs);
         const timesIncorrect = !this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         const times = (timesIncorrect) ? this.actualTimes + 1 : this.actualTimes;
