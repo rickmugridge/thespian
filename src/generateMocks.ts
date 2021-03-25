@@ -10,7 +10,7 @@ export const generateMocks = (fileName: string): any => {
 // console.log(program)
 
     ts.forEachChild(sourceFile!, (node: ts.Node) => {
-        if (ts.isClassDeclaration(node)  && isExported(node)) {
+        if (ts.isClassDeclaration(node) && isExported(node)) {
             console.log('class', {name: node.name?.escapedText})
             node.members.forEach(member => {
                 if (ts.isConstructorDeclaration(member)) {
@@ -45,9 +45,11 @@ const getParameterType = (param: ParameterDeclaration): string => {
 }
 
 const getType = (type: TypeNode): string => {
+    const typeAny = type as any;
     switch (type.kind) {
         case SyntaxKind.TypeReference:
-            return (type as any).typeName.escapedText
+            console.log(typeAny.typeName.escapedText, typeAny.typeParameters)
+            return typeAny.typeName.escapedText // todo Also look at typeParameters for generics???
         case SyntaxKind.StringKeyword:
             return "string"
         case SyntaxKind.NumberKeyword:
@@ -59,23 +61,22 @@ const getType = (type: TypeNode): string => {
         case SyntaxKind.AnyKeyword:
             return "any"
         case SyntaxKind.FunctionType:
-            // console.log({type})
-            const parameters = mapElements((type as any).parameters.map(p=>p.type), ", ");
-            return `(${parameters}) => ${getType((type as any).type)}`
+            const paramWithTypes = typeAny.parameters.map(p => `${p.name.escapedText}: ${getType(p.type)}`).join(", ");
+            return `(${paramWithTypes}) => ${getType(typeAny.type)}`
         case SyntaxKind.UnionType:
-            return `${mapElements((type as any).types, " | ")}`
+            return `${mapElements(typeAny.types, " | ")}`
         case SyntaxKind.IntersectionType:
-            return `${mapElements((type as any).types, " & ")}`
+            return `${mapElements(typeAny.types, " & ")}`
         case SyntaxKind.ArrayType:
-            return `${getType((type as any).elementType)}[]`
+            return `${getType(typeAny.elementType)}[]`
         case SyntaxKind.TupleType:
-            return `[${mapElements((type as any).elements, ", ")}]`
+            return `[${mapElements(typeAny.elements, ", ")}]`
         default:
             return `UNKNOWN(${type.kind})`
     }
 }
 
-const mapElements = (elements: any[], join:string) =>
+const mapElements = (elements: any[], join: string) =>
     elements
         .filter(e => ofType.isObject(e))
         .map(e => getType(e))
