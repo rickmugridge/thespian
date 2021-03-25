@@ -47,10 +47,7 @@ const getParameterType = (param: ParameterDeclaration): string => {
 const getType = (type: TypeNode): string => {
     const typeAny = type as any;
     switch (type.kind) {
-        case SyntaxKind.TypeReference:
-            console.log(typeAny.typeName.escapedText, typeAny.typeParameters)
-            return typeAny.typeName.escapedText // todo Also look at typeParameters for generics???
-        case SyntaxKind.StringKeyword:
+         case SyntaxKind.StringKeyword:
             return "string"
         case SyntaxKind.NumberKeyword:
             return "number"
@@ -60,6 +57,12 @@ const getType = (type: TypeNode): string => {
             return "object"
         case SyntaxKind.AnyKeyword:
             return "any"
+        case SyntaxKind.TypeReference:
+            const generics = mapElements(typeAny.typeArguments || [], ", ")
+            if (generics === '')
+                return typeAny.typeName.escapedText
+            else
+                return `${typeAny.typeName.escapedText}<${generics}>`
         case SyntaxKind.FunctionType:
             const paramWithTypes = typeAny.parameters.map(p => `${p.name.escapedText}: ${getType(p.type)}`).join(", ");
             return `(${paramWithTypes}) => ${getType(typeAny.type)}`
