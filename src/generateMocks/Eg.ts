@@ -2,13 +2,17 @@ import {Mocked} from "../Mocked";
 import {MockFixture} from "../MockFixture";
 import {MockHandler} from "../MockHandler";
 
+export const fun2 = (a: Symbol) => a
+
 export class Eg {
     constructor(s: string, no: number, obj: object, a: any,
-                nums: number[], flags: boolean[], tuple: [number, string],
-                identifier: MockHandler, genericIdentifier: Mocked<MockHandler>, genericIdentifier2: Mocked<string>,
+                nums: number[], flags: boolean[],
+                arr: Array<number>, tuple: [number, string],
+                identifier: MockHandler, genericIdentifier: Mocked<MockHandler>,
+                genericIdentifier2: Mocked<string>,
                 union: string | number, intersection: number & string,
-                fn: (a: number, b: boolean) => string,
-                sym: Symbol, date: Date) {
+                fn: (a: number, b: boolean) => Mocked<MockHandler>,
+                sym: Symbol, date: Date, prom: Promise<string>) {
     }
 
     foo(a: MockFixture) {

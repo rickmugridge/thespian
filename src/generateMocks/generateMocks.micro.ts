@@ -1,7 +1,6 @@
-import {generateMocks} from "./generateMocks";
 import {Thespian} from "../Thespian";
 
-describe("generateMocks", () => {
+xdescribe("generateMocks", () => {
     it("works", () => {
         Thespian.generateMocks("/Users/rickmugridge/Documents/working/thespian/src/generateMocks/Eg.ts")
     });

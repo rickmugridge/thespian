@@ -1,9 +1,10 @@
 import * as ts from 'typescript'
-import {getClassDetails} from "./getClassDetails";
+import {DecompiledClassOrFunction, getClassDetails} from "./getClassDetails";
 
 const headerTemplate = `
 import { Thespian, TMocked } from 'thespian'
-import { assertThat } from 'mismatched'`
+import { assertThat } from 'mismatched'
+`
 
 const template = `
 describe('@{name}', () => {
@@ -17,57 +18,39 @@ describe('@{name}', () => {
 })
 `
 
-export const generateMocks = (fileName: string): any => {
+export const generateMocks = (fileName: string): string => {
     var cmd = ts.parseCommandLine([fileName]);
     let program = ts.createProgram(cmd.fileNames, cmd.options);
     const sourceFile = program.getSourceFile(fileName);
 
-    console.log(headerTemplate)
+    const results: string[] = []
     const classDetails = getClassDetails(sourceFile!);
-    classDetails.forEach(classDetail => {
-        let lets = ''
-        let initialisers = ''
-        classDetail.parameters.forEach(param => {
-            if (isToBeMocked(param.type)) {
-                lets += `\n  let ${param.name}: TMocked<${param.type}>`
-                initialisers += `\n    ${param.name} = thespian.mock<${param.type}>("${param.name}")`
-            }
-        })
-        if (classDetail.isClass) {
-            const params = classDetail.parameters.map(p => {
-                return isToBeMocked(p.type) ? `${p.name}.object` : 'undefined'
-            }).join(", ")
-            lets += `\n  let ${classDetail.name}: ${classDetail.name}`
-            initialisers += `\n    ${classDetail.name} = new ${classDetail.name}(${params})`
+    classDetails.forEach(classDetail => mockClassOrFunction(classDetail, results))
+    if (results.length > 0) {
+        return headerTemplate + results.join()
+    }
+    return ''
+}
+
+export const mockClassOrFunction = (classDetail: DecompiledClassOrFunction, results: string[]) => {
+    let mockingRequired = false
+    let lets = ''
+    let initialisers = ''
+    classDetail.parameters.forEach(param => {
+        if (!param.isPrimitive()) {
+            mockingRequired = true
+            lets += param.displayLet()
+            initialisers += param.displayInitialiser()
         }
-        console.log(fillTemplate(template, {name: classDetail.name, lets, initialisers}))
     })
-}
-
-const primitives = ["string", "number", "boolean", "Symbol", "Date"]
-const isToBeMocked = (type: string): boolean => {
-    if (primitives.find(p => p === type)) {
-        return false
+    if (classDetail.isClass) {
+        const params = classDetail.parameters.map(p => p.displayMockOrValue()).join(", ")
+        lets += `\n  let ${classDetail.name}: ${classDetail.name}`
+        initialisers += `\n    ${classDetail.name} = new ${classDetail.name}(${params})`
     }
-    if (type.endsWith('[]')) {
-        return !!primitives.find(p => p === type + '[]');
-    }
-    if (type.startsWith('[') && type.endsWith(']')) {
-        const types = type.slice(1, type.length - 1).split(", ")
-        return includesToBeMocked(types)
-    }
-    const unions = type.split('| ');
-    if (unions && unions.length > 1) {
-        return includesToBeMocked(unions)
-    }
-    const intersections = type.split('& ');
-    if (intersections && intersections.length > 1) {
-        return includesToBeMocked(intersections)
-    }
-    return true
-}
-
-const includesToBeMocked = (types: string[]) => !!types.find(t => isToBeMocked(t))
+    if (mockingRequired)
+        results.push(fillTemplate(template, {name: classDetail.name, lets, initialisers}))
+};
 
 const fillTemplate = (template: string, fillers: any) => {
     let result = template

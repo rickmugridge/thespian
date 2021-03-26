@@ -12,6 +12,10 @@ export class Thespian {
     private mocks: Array<Mocked<any>> = []; // One for each Mocked object or function
     private successfulCalls: Array<SuccessfulCall> = [];
 
+    static generateMocks(fileName: string) {
+        console.log(generateMocks(fileName))
+    }
+
     mock<T>(name: string = "mock#" + mockCount++): TMocked<T> {
         const mock = new Mocked<T>(name, this.successfulCalls);
         this.mocks.push(mock);
@@ -26,16 +30,12 @@ export class Thespian {
         const errors: Array<any> = [];
         this.mocks.forEach(m => m.verify(errors));
         if (errors.length > 0) {
-            throw new Error("Problem(s) with mock expectations not being met:\n"+
+            throw new Error("Problem(s) with mock expectations not being met:\n" +
                 Thespian.printer.render(errors));
         }
     }
 
     describeMocks() {
         Thespian.printer.logToConsole(this.mocks.map(m => m.describeMocks()));
-    }
-
-    static generateMocks(fileName: string) {
-        generateMocks(fileName)
     }
 }
