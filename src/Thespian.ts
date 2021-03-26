@@ -2,6 +2,7 @@ import {Mocked} from "./Mocked";
 import {PrettyPrinter} from "mismatched";
 import {TMocked} from "./TMocked";
 import {SuccessfulCall} from "./SuccessfulCall";
+import {generateMocks} from "./generateMocks/generateMocks";
 
 let mockCount = 1;
 
@@ -32,5 +33,9 @@ export class Thespian {
 
     describeMocks() {
         Thespian.printer.logToConsole(this.mocks.map(m => m.describeMocks()));
+    }
+
+    static generateMocks(fileName: string) {
+        generateMocks(fileName)
     }
 }
