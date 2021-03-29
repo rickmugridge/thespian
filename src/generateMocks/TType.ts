@@ -83,6 +83,23 @@ export class TBoolean implements TType {
     }
 }
 
+export class TEnum implements TType {
+    constructor(private enumName: string, private defaultValueName: string) {
+    }
+
+    isPrimitive(): boolean {
+        return true;
+    }
+
+    displayType(): string {
+        return this.enumName;
+    }
+
+    displayMockOrValue(name: string): string {
+        return `${this.enumName}.${this.defaultValueName}`
+    }
+}
+
 export class TBuiltInClass implements TType {
     constructor(private typeName: string) {
     }

@@ -3,14 +3,19 @@ import {ParameterDeclaration} from "typescript";
 import {getCompiledType} from "./getCompiledType";
 import {TParam, TType, TUnknown} from "./TType";
 
-export const getClassDetails = (source: ts.SourceFile): DecompiledClassOrFunction[] => {
+export const getClassDetails = (source: ts.SourceFile,
+                                elementaryClassSet: Set<string>,
+                                enumMap: Map<string, string>): DecompiledClassOrFunction[] => {
     const classDetails: DecompiledClassOrFunction[] = []
     ts.forEachChild(source, (node: ts.Node) => {
         if (ts.isClassDeclaration(node) && isExported(node)) {
             const name = getName(node.name)
             node.members.forEach(member => {
                 if (ts.isConstructorDeclaration(member)) {
-                    classDetails.push({isClass: true, name, parameters: getParameters(member.parameters)})
+                    classDetails.push({
+                        isClass: true, name,
+                        parameters: getParameters(member.parameters, elementaryClassSet, enumMap)
+                    })
                 }
             })
         } else if (ts.isVariableStatement(node) && isExported(node as any)) {
@@ -19,7 +24,10 @@ export const getClassDetails = (source: ts.SourceFile): DecompiledClassOrFunctio
                 const initializer = variableDeclarations[0].initializer as any
                 if (ts.isArrowFunction(initializer)) {
                     const name = (variableDeclarations[0].name as any).escapedText!.toString()!
-                    classDetails.push({isClass: false, name, parameters: getParameters(initializer.parameters)})
+                    classDetails.push({
+                        isClass: false, name,
+                        parameters: getParameters(initializer.parameters, elementaryClassSet, enumMap)
+                    })
                 }
             }
         }
@@ -32,14 +40,20 @@ const isExported = (node: ts.Declaration): boolean =>
 
 export const getName = (name?: ts.Identifier): string => name?.escapedText?.toString() || 'unknown'
 
-const getParameters = (parameters: ts.NodeArray<ts.ParameterDeclaration>) =>
-    parameters.map(p => new TParam((p.name as any).escapedText, getParameterType(p)))
+const getParameters = (parameters: ts.NodeArray<ts.ParameterDeclaration>,
+                       elementaryClassSet: Set<string>,
+                       enumMap: Map<string, string>) =>
+    parameters.map(p => new TParam(
+        (p.name as any).escapedText,
+        getParameterType(p, elementaryClassSet, enumMap)))
 
-const getParameterType = (param: ParameterDeclaration): TType => {
+const getParameterType = (param: ParameterDeclaration,
+                          elementaryClassSet: Set<string>,
+                          enumMap: Map<string, string>): TType => {
     if (!param.type) {
         return new TUnknown(0)
     }
-    return getCompiledType(param.type)
+    return getCompiledType(param.type, elementaryClassSet, enumMap)
 }
 
 export interface DecompiledClassOrFunction {

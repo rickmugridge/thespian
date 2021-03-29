@@ -1,11 +1,12 @@
 # Nine Common AntiPatterns in JS/TS Mocking Frameworks
 
-# Rick Mugridge, Hypr, 17 November 2019
+# Rick Mugridge, Hypr, 30 March 2021
 
-I've used a variety of existing mocking frameworks in Typescript development over the last 4 years.
+I've used a variety of existing mocking frameworks in Typescript development over the last 6 years.
 Most are fine for very simple testing, with simple objects/arrays.
 
-But these all suffered from one or more problems, when mocking where:
+But these all suffered from one or more problems, when mocking or the obejcts concerned get more comples. 
+For example, when:
 
  - Several mocks are needed, when test driving a class that plays a coordination role and has several dependencies
    injected into that class.
@@ -15,7 +16,7 @@ But these all suffered from one or more problems, when mocking where:
       so they need to be ignored or matched in a general way.
     - If the arguments don't quite match, it takes time to work out the difference
   - The argument doesn't quite match and I see the actual result is correct. 
-    I copy JSON output and convert it before using it in my test.
+    When the data is complex, I have to copy JSON output and convert it before I can use it in my test.
   - I need the same mocked call with the same arguments to return different results
  
 As you might expect, these anti-patterns slowed me down as they were unhelpful.
@@ -54,8 +55,24 @@ The anti-patterns:
      (ie, a laborious hand-written matcher).
    - Partially match the fields of an object.
      But this only works if the tricky field is only one level deep in the object.
- 
-## 3. Errors, when argument matching fails, are inadequate
+   - This gets worse when we have to use different matchers for:
+     - matching arguments in mocks
+     - matching results in test checks/verifications/assertions
+
+## 3. We get to the verify() step before we know something has gone wrong
+
+- I find that it's better to stop immediately when something goes wrong, to ease diagnosis.
+- This requires mock expections (`setup()`) to be defined before the test calls the system under test.
+- I find it much easier to work out what's going on when it fails immediately, as the call-stack is available.
+
+## 4. Mocks return `undefined` when nothing matches (instead of failing immediately)
+
+- But 'undefined' is a valid JS value.
+- It can make it hard to track down the source of the problem with complex logic.
+  The `undefined` value may make sense or make sense part-way through the logic, so it takes a while to fail.
+- Related to #3
+
+## 5. Errors, when argument matching fails, are inadequate
 
  - Consider when an argument of a mocked call is a complex, nested object/array.
  - The difference between the expected and actual argument may be slight.
@@ -65,39 +82,30 @@ The anti-patterns:
    But this can mean that we miss changes in the actual data that are additions to the ones we've checked.
  - A diff would be so handy. 
    Then we can check large complex objects and see what bits are wrong really easily.
- 
-## 4. Mocks are not identified in error messages 
+ - It can also be handy to show multiple near misses when several are near matches.
+
+## 6. When a mocked call fails, little context is given
+
+- It would be handy to know what mocks had been called successfully beforehand.
+  Especially when several mocks and/or calls are involved.
+
+## 7. Mocks are not identified in error messages 
 
  - Instead, just the method/function and arguments are shown.
  - With more complex mocking situations, it may not be immediately obvious which mock is involved.
-   Especially when there are more than one mock of the same type.
+   Especially when there are several mocks of the same type.
  
-## 5. Calls to a mocked object can't be sequenced
+## 8. Two or more calls are not permitted to the same mocked function/method with the same arguments but with different results
 
- - I know of one mocking framework that suffers from this.
+ - I know of one mocking framework that suffers from this. 
  - It was necessary to write a general wrapper that would manage sequences.
  - Few allow for multiple mocked calls to the same method/function with the same arguments but giving different results.
-   This doesn't often arise, but it would be handy if you could do it.
+   This doesn't often arise, but is handy when needed.
 
-## 6. Mocks return `undefined` when nothing matches (instead of failing immediately)
+## 9. We have to verify each of the mocks in turn
 
- - But 'undefined' is a valid JS value. 
- - It can make it hard to track down the source of the problem with complex logic.
-   The `undefined` value may make sense or make sense part-way through the logic, so it takes a while to fail.
+ - It would be simpler if the framework verified all of the mocks in one step.
  
-## 7. We get to the verify() step before we know something has gone wrong
-
- - I find that it's better to stop immediately when something goes wrong, to ease diagnosis.
- - Hence mock expections (`setup()`) need to be defined before the test calls the system under test.
- 
-## 8. We have to verify each of the mocks in turn
-
- - It would be better if the framework verified all of the mocks in one step.
- 
-## 9. When a mocked call fails, little context is given
-
- - It would be handy to know what mocks had been called successfully beforehand.
-   Especially when several mocks and/or calls are involved.
 
 # Question
 
@@ -110,5 +118,5 @@ Have I missed any anti-patterns? Why did I not include examples? I didn't want t
 I wasn't able to find a suitable matching library to use with `thespian`, with decent composabily.
 So I wrote my own: [`mismatched`](https://github.com/rickmugridge/mismatched).
 In addition to being an assertion/matching system, `mismatched` includes a `PrettyPrinter` that is used to 
-display JS values (including error messages). This "knows" about `thespian` mocks so can render them helpfully.
+display JS values (including error messages). This "knows" about `thespian` mocks so it can render them helpfully.
 It also allows for `custom rendering`, based on the class of an object (eg, `Moment`).

@@ -12,8 +12,15 @@ export class Thespian {
     private mocks: Array<Mocked<any>> = []; // One for each Mocked object or function
     private successfulCalls: Array<SuccessfulCall> = [];
 
-    static generateMocks(fileName: string) {
-        console.log(generateMocks(fileName))
+    static generateMocks(fileName: string,
+                         elementaryInterfaces: string[] = [],
+                         elementaryClasses: any = {},
+                         enums: any = {}) {
+        const elementaryClassSet: Set<string> = new Set(Object.keys(elementaryClasses))
+        elementaryInterfaces.forEach(ei => elementaryClassSet.add(ei))
+        const enumMap: Map<string, string> = new Map()
+        Object.keys(enums).forEach(key => enumMap.set(key, (Object.keys(enums[key]))[0]))
+        console.log(generateMocks(fileName, elementaryClassSet, enumMap))
     }
 
     mock<T>(name: string = "mock#" + mockCount++): TMocked<T> {

@@ -6,6 +6,7 @@ import {
     TBoolean,
     TBuiltInClass,
     TClass,
+    TEnum,
     TGeneric,
     TIntersection,
     TNumber,
@@ -18,7 +19,9 @@ import {
 } from "./TType";
 import {getName} from "./getClassDetails";
 
-export const getCompiledType = (type: TypeNode): TType => {
+export const getCompiledType = (type: TypeNode,
+                                elementaryClassSet: Set<string>,
+                                enumMap: Map<string, string>): TType => {
     const typeAny = type as any;
     switch (type.kind) {
         case SyntaxKind.StringKeyword:
@@ -34,23 +37,25 @@ export const getCompiledType = (type: TypeNode): TType => {
         case SyntaxKind.AnyKeyword:
             return new TClass('any')
         case SyntaxKind.TypeReference:
-            return handleTypeReference(typeAny)
+            return handleTypeReference(typeAny, elementaryClassSet, enumMap)
         case SyntaxKind.FunctionType:
-            return new TArrow(mapParameters(typeAny.parameters), getCompiledType(typeAny.type))
+            return new TArrow(
+                mapParameters(typeAny.parameters, elementaryClassSet, enumMap),
+                getCompiledType(typeAny.type, elementaryClassSet, enumMap))
         case SyntaxKind.UnionType:
-            return new TUnion(mapElements(typeAny.types))
+            return new TUnion(mapElements(typeAny.types, elementaryClassSet, enumMap))
         case SyntaxKind.IntersectionType:
-            return new TIntersection(mapElements(typeAny.types))
+            return new TIntersection(mapElements(typeAny.types, elementaryClassSet, enumMap))
         case SyntaxKind.ArrayType:
-            return new TArray(getCompiledType(typeAny.elementType))
+            return new TArray(getCompiledType(typeAny.elementType, elementaryClassSet, enumMap))
         case SyntaxKind.TupleType:
-            return new TTuple(mapElements(typeAny.elements))
+            return new TTuple(mapElements(typeAny.elements, elementaryClassSet, enumMap))
         default:
             return new TUnknown(type.kind)
     }
 }
 
-const builtInSet: Set<string> = new Set(
+const builtInClassSet: Set<string> = new Set(
     [
         'Array', 'ArrayBuffer', 'AsynchFunction', 'Atomics',
         'BigInt', 'BigInt64Array', 'BigUint64Array', 'Boolean',
@@ -63,16 +68,26 @@ const builtInSet: Set<string> = new Set(
         'WeakMap', 'WeakSet', 'WebAssembly'
     ])
 
-const handleTypeReference = (type: any): TType => {
+const handleTypeReference = (type: any,
+                             elementaryClassSet: Set<string>,
+                             enumMap: Map<string, string>): TType => {
     const name = getName(type.typeName);
-    if (builtInSet.has(name))
+    if (builtInClassSet.has(name) || elementaryClassSet.has(name))
         return new TBuiltInClass(name)
-    const generics = mapElements(type.typeArguments || []).map(t => new TGeneric(t))
+    const enumValue = enumMap.get(name)
+    if (enumValue)
+        return new TEnum(name, enumValue)
+    const generics = mapElements(type.typeArguments || [], elementaryClassSet, enumMap)
+        .map(t => new TGeneric(t))
     return new TClass(name, generics)
 }
 
-const mapElements = (elements: any[]): TType[] =>
-    elements.filter(e => ofType.isObject(e)).map(e => getCompiledType(e))
+const mapElements = (elements: any[],
+                     elementaryClassSet: Set<string>,
+                     enumMap: Map<string, string>): TType[] =>
+    elements.filter(e => ofType.isObject(e)).map(e => getCompiledType(e, elementaryClassSet, enumMap))
 
-const mapParameters = (parameters: any[]): TParam[] =>
-    parameters.map(p => new TParam(p.name.escapedText, getCompiledType(p.type)))
+const mapParameters = (parameters: any[],
+                       elementaryClassSet: Set<string>,
+                       enumMap: Map<string, string>): TParam[] =>
+    parameters.map(p => new TParam(p.name.escapedText, getCompiledType(p.type, elementaryClassSet, enumMap)))

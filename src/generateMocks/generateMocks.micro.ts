@@ -1,7 +1,9 @@
 import {Thespian} from "../Thespian";
+import {Colour, ElementaryClass} from "./Eg";
 
-xdescribe("generateMocks", () => {
+describe("generateMocks", () => {
     it("works", () => {
-        Thespian.generateMocks("/Users/rickmugridge/Documents/working/thespian/src/generateMocks/Eg.ts")
+        const fileName = "/Users/rickmugridge/Documents/working/thespian/src/generateMocks/Eg.ts";
+        Thespian.generateMocks(fileName, ['Logger'], {ElementaryClass}, {Colour})
     });
 });

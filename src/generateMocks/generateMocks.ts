@@ -18,13 +18,15 @@ describe('@{name}', () => {
 })
 `
 
-export const generateMocks = (fileName: string): string => {
+export const generateMocks = (fileName: string,
+                              elementaryClassSet: Set<string>,
+                              enumMap: Map<string, string>): string => {
     var cmd = ts.parseCommandLine([fileName]);
     let program = ts.createProgram(cmd.fileNames, cmd.options);
     const sourceFile = program.getSourceFile(fileName);
 
     const results: string[] = []
-    const classDetails = getClassDetails(sourceFile!);
+    const classDetails = getClassDetails(sourceFile!, elementaryClassSet, enumMap);
     classDetails.forEach(classDetail => mockClassOrFunction(classDetail, results))
     if (results.length > 0) {
         return headerTemplate + results.join()
