@@ -80,7 +80,7 @@ The anti-patterns:
  - With such limited information, it makes sense to check the various parts of a complex object or array.
    Otherwise, it's very hard to identify and understand the differences.
    But this can mean that we miss changes in the actual data that are additions to the ones we've checked.
- - A diff would be so handy. 
+ - A diff would be so handy, including over longer strings. 
    Then we can check large complex objects and see what bits are wrong really easily.
  - It can also be handy to show multiple near misses when several are near matches.
 
@@ -106,6 +106,10 @@ The anti-patterns:
 
  - It would be simpler if the framework verified all of the mocks in one step.
  
+## Other possibilities
+
+ * Type checking of matchers
+ * Easier to read if lay out object structure direct;y - pain a picture. Eg comparing a lot of assertThats and one.
 
 # Question
 

@@ -7,7 +7,7 @@ import {
     TBuiltInClass,
     TClass,
     TEnum,
-    TGeneric,
+    TGenericArgument, TGenericParameter,
     TIntersection,
     TNumber,
     TParam,
@@ -15,9 +15,10 @@ import {
     TTuple,
     TType,
     TUnion,
-    TUnknown
+    TUnknown,
+    TVoid
 } from "./TType";
-import {getName} from "./getClassDetails";
+import {getName} from "./getCompiled";
 
 export const getCompiledType = (type: TypeNode,
                                 elementaryClassSet: Set<string>,
@@ -50,6 +51,8 @@ export const getCompiledType = (type: TypeNode,
             return new TArray(getCompiledType(typeAny.elementType, elementaryClassSet, enumMap))
         case SyntaxKind.TupleType:
             return new TTuple(mapElements(typeAny.elements, elementaryClassSet, enumMap))
+        case SyntaxKind.VoidKeyword:
+            return new TVoid()
         default:
             return new TUnknown(type.kind)
     }
@@ -77,9 +80,7 @@ const handleTypeReference = (type: any,
     const enumValue = enumMap.get(name)
     if (enumValue)
         return new TEnum(name, enumValue)
-    const generics = mapElements(type.typeArguments || [], elementaryClassSet, enumMap)
-        .map(t => new TGeneric(t))
-    return new TClass(name, generics)
+    return new TClass(name, mapGenericArguments(type.typeArguments, elementaryClassSet, enumMap))
 }
 
 const mapElements = (elements: any[],
@@ -91,3 +92,11 @@ const mapParameters = (parameters: any[],
                        elementaryClassSet: Set<string>,
                        enumMap: Map<string, string>): TParam[] =>
     parameters.map(p => new TParam(p.name.escapedText, getCompiledType(p.type, elementaryClassSet, enumMap)))
+
+export const mapGenericArguments = (typeArguments: any[],
+                                    elementaryClassSet: Set<string>,
+                                    enumMap: Map<string, string>) =>
+    mapElements(typeArguments || [], elementaryClassSet, enumMap).map(t => new TGenericArgument(t))
+
+export const mapGenericParameters = (typeParameters?: any[]) =>
+    (typeParameters || []).filter(e => ofType.isObject(e)).map(t => new TGenericParameter(getName(t.name)))

@@ -2,9 +2,29 @@ import {Mocked} from "../Mocked";
 import {MockFixture} from "../MockFixture";
 import {MockHandler} from "../MockHandler";
 
+export interface Logger<T> {
+    ttt: T
+    i: number
+    color: Colour
+    date: Date
+    buffer: ArrayBuffer
+    flags: boolean[]
+    tuple: [number, string]
+    eg: Eg<string>
+    genericIdentifier: Mocked<MockHandler>
+    union: string | number
+    intersection: number & string
+    fun: (a: number) => string
+    gun: (a: number) => number
+
+    info(s: T): void
+
+    error(s: string): void
+}
+
 export const fun2 = (a: Symbol) => a
 
-export class Eg {
+export class Eg<T> {
     constructor(s: string, no: number, obj: object, a: any,
                 nums: number[], flags: boolean[],
                 arr: Array<number>, tuple: [number, string],
@@ -13,15 +33,13 @@ export class Eg {
                 union: string | number, intersection: number & string,
                 fn: (a: number, b: boolean) => Mocked<MockHandler>,
                 sym: Symbol, date: Date, prom: Promise<string>,
-                elementary: ElementaryClass, colour: Colour, logger: Logger) {
+                elementary: ElementaryClass, colour: Colour, logger: Logger<T>) {
     }
 
     foo(a: MockFixture) {
 
     }
 }
-
-interface Logger {}
 
 export const pi = 3.14
 

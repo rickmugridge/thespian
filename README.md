@@ -279,38 +279,83 @@ Here's an example of a function being mocked.
  - `thespian` is intended to mock interfaces (or classes) and to do that simply and well. 
    It does **not** try to do fancy tricks to deal with smelly code, such as partial mocking of real objects, 
    mocking modules, mocking global variables, and etc.
- - It also mocks functions (and later: object properties).
+ - It also mocks functions and object properties.
  - Mocks are identified, so it's easier to understand error messages when multiple mocks are involved.
  - Expectations are set up before running the system under test.
  - A test fails immediately if a call fails to match a mock - it doesn't return `undefined` by default!
    Any mock calls that have succeeded by that point are also displayed, to give context.
  - A Thespian object oversees the creation of all mocks for a test. 
-   The Thespian is responsible for verification of expected calls across all mocks at once.
- - For matching mock call arguments, it uses `mismatched`, a sophisticated matcher (originally a part of `thespian`).
+   The Thespian is responsible for verification at the end of a test of expected calls across all mocks at once.
+ - For matching mock call arguments, it uses `mismatched`, a sophisticated matcher.
    It displays a mock in a useful form when it is the argument to a failed mock call.
  - It permits multiple mocked calls to the same method/function with the same arguments but different results.
 
 `Thespian` follows the design decisions of `JMock2` in Java.
 And `mismatched` follows the design decisions of `hamcrest`.
 
-But it follows some of syntax of Moq and TypeMoq, but little of the philosophy.
+`Thespian` is based on the syntax of `Moq` and `TypeMoq`, but follows little of the philosophy.
 
 See [Common Mocking Anti-Patterns](CommonMockingAntiPatterns.md)
     
 # FAQ
 
-  - "I want to match an argument with a complex object structure.
-     But deep within the structure, I want to ignore a randomly-generated value.
-     How can I do that?"
-       - The matcher [`mismatched`](https://github.com/rickmugridge/mismatched) 
-         is used in `thespian` for matching arguments of expected method and 
-         function calls. It provides for such matching. 
-       - For an example, see the section `Mocking with sophisticated argument matching on calls` above.
-  - "I am passing a mock so it ends up being used in a Promise chain.
-     Even though it is not a Promise, it fails when its `.then()` is checked.
-     How can I avoid the failure?"
+## "I want to match an argument with a complex object structure.
+
+But deep within the structure, I want to ignore a randomly-generated value.
+How can I do that?"
+  - The matcher [`mismatched`](https://github.com/rickmugridge/mismatched) is used in `thespian` 
+    for matching arguments of expected method and function calls. It provides for such matching. 
+  - For an example, see the section `Mocking with sophisticated argument matching on calls` above.
+
+## What if the returned value from a mocked method/function depends on the argument?
+
+The .`returns()` part is supplied with the actual arguments to that call, and they can be used. 
+For example, for mocking the function `positiveIncrement`:
+
+```
+        mockFn
+            .setup(positiveIncrement => positiveIncrement(match.number.greaterEqual(0)))
+            .returns((n:number) => n + 1);
+```
+
+## What if a mocked method/function needs to have side-effects?
+
+The `.returns()` part can cause those side-effects:
+
+```
+       let count = 0
+        mockFn
+            .setup(nextInt => nextInt())
+            .returns(() => count++);
+```
+
+
+## "I am passing a mock so it ends up being used in a Promise chain.
+
+Even though it is not a Promise, it fails when its `.then()` is checked.
+How can I avoid the failure?"
      
-      - Simply define a mock on its `then` property to return `undefined`:
-      - `mockObj.setup(m => b.then).returns(()=> undefined);`
-  - "What's a good way of checking that a method correctly returns a rejected Promise?"
-      - See [Testing Returned Promise Is Rejected](TestingPromiseIsRejected.md)
+ - Simply define a mock on its `then` property to return `undefined`:
+ - `mockObj.setup(m => b.then).returns(()=> undefined);`
+
+## "What's a good way of checking that a method correctly returns a rejected Promise?"
+
+ - See [Testing Returned Promise Is Rejected](TestingPromiseIsRejected.md)
+
+## I get an error when I write a mock setup like this:
+```
+        mockFn
+            .setup(fun => { const part = whole.part[0]; return fun(part.a, part.b)})
+            .returns(() => 33);
+```
+ - The issue here is the `Thespian` works out at runtime what function/method is being called (here with `g`).
+   It does not allow for a block being used, with `{}`, as that code could be arbitrarily complex. 
+   So the above needs to be changed to the following (or equivalent):
+
+```
+        const part = whole.part[0]
+        mockFn
+            .setup(g =>  fun(part.a, part.b))
+            .returns(() => 33);
+```
+   
