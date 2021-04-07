@@ -14,8 +14,6 @@ export const getCompiled = (source: ts.SourceFile,
         } else if (ts.isInterfaceDeclaration(node)) {
             const anInterface = getCompiledInterface(node, elementaryClassSet, enumMap);
             decompiledArray.push(anInterface)
-            // PrettyPrinter.logToConsole({anInterface, at: "getClassDetails.ts:44"}); // todo RM Remove
-
         } else if (ts.isVariableStatement(node) && isExported(node as any)) {
             getCompiledFunction(node, decompiledArray, elementaryClassSet, enumMap);
         }

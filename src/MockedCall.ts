@@ -11,7 +11,6 @@ export class MockedCall<U> { // where U is the return type
     private expectedTimesInProgress = match.isEquals(1) as DiffMatcher<any>;
     private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
     private actualTimes = 0;
-    private returnFn: (...args: Array<any>) => U = () => undefined as any as U;
 
     constructor(public fullName: string,
                 public methodName: string,
@@ -66,7 +65,10 @@ export class MockedCall<U> { // where U is the return type
                 actualArgs, result, this.expectedTimes.describe()));
             return {result};
         } catch (e) {
-            Thespian.printer.logToConsole({exception: "In MockedCall.didRun()", e}); // todo Improve message
+            Thespian.printer.logToConsole({
+                mockedReturn: this.fullName + '.' + this.methodName,
+                failed: e.message,
+            });
             throw e;
         }
     }
@@ -90,6 +92,8 @@ export class MockedCall<U> { // where U is the return type
         return UnsuccessfulCall.make(this.fullName, 0,
             this.expectedArgs.describe(), this.expectedTimes.describe(), this.actualTimes).describe();
     }
+
+    private returnFn: (...args: Array<any>) => U = () => undefined as any as U;
 }
 
 export interface RunResult {
