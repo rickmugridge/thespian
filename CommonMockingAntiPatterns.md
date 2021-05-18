@@ -105,7 +105,11 @@ The anti-patterns:
 ## 9. We have to verify each of the mocks in turn
 
  - It would be simpler if the framework verified all of the mocks in one step.
- 
+
+## 10. We need to b able to return mock arguments from calls and check they are equal
+
+ - Includes when the mock could be a Promise, and need to handle `mock.then` access
+
 ## Other possibilities
 
  * Type checking of matchers
