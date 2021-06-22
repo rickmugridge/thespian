@@ -318,6 +318,20 @@ For example, for mocking the function `positiveIncrement`:
             .returns((n:number) => n + 1);
 ```
 
+## What if the returned value from a mocked method/function is to be different on two calls
+
+Define the setup for each possibility. They are applied in the order that you define them. 
+Eg, in the following the first call to the function will return 1 and the second call will return 2:
+
+```
+        mockFn
+            .setup(positiveIncrement => positiveIncrement(match.any()))
+            .returns(() => 1);
+       mockFn
+            .setup(positiveIncrement => positiveIncrement(match.any()))
+            .returns(() => 2);
+```
+
 ## What if a mocked method/function needs to have side-effects?
 
 The `.returns()` part can cause those side-effects:
