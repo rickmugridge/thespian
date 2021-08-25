@@ -106,9 +106,13 @@ The anti-patterns:
 
  - It would be simpler if the framework verified all of the mocks in one step.
 
-## 10. We need to b able to return mock arguments from calls and check they are equal
+## 10. We need to be able to return mock arguments from calls and check they are equal
 
  - Includes when the mock could be a Promise, and need to handle `mock.then` access
+
+## 11. (mismatched) Much better to test the whole object rather than a set of assertThats
+
+ - Otherwise, when the type of the object is extended, it's easy to miss the extra attributes
 
 ## Other possibilities
 
