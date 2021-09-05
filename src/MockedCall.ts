@@ -67,7 +67,7 @@ export class MockedCall<U> { // where U is the return type
         } catch (e) {
             Thespian.printer.logToConsole({
                 mockedReturn: this.fullName + '.' + this.methodName,
-                failed: e.message,
+                failed: e.message || e,
             });
             throw e;
         }
