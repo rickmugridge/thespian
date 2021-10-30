@@ -98,7 +98,8 @@ describe("Thespian()", () => {
   mockCall: anObject.foo(4, "aaa"), 
   nearMisses: [
     {
-      call: anObject.foo({${MatchResult.was}: 4, ${MatchResult.expected}: 2}, "aaa"), 
+      call: 
+      anObject.foo({${MatchResult.unexpected}: 4}, {${MatchResult.expected}: 2}, "aaa"), 
       expectedTimes: 1, actualTimes: 0
     }
   ]
@@ -157,7 +158,8 @@ describe("Thespian()", () => {
   nearMisses: [
     {call: anObject.foo(2, "aaa"), expectedTimes: 1, actualTimes: 2}, 
     {
-      call: anObject.foo({${MatchResult.was}: 2, ${MatchResult.expected}: 3}, "aaa"), 
+      call: 
+      anObject.foo({${MatchResult.unexpected}: 2}, {${MatchResult.expected}: 3}, "aaa"), 
       expectedTimes: 1, actualTimes: 0
     }
   ], 
@@ -182,12 +184,13 @@ describe("Thespian()", () => {
   mockCall: anObject.foo(3, "aaa"), 
   nearMisses: [
     {
-      call: anObject.foo({${MatchResult.was}: 3, ${MatchResult.expected}: 2}, "aaa"), 
+      call: 
+      anObject.foo({${MatchResult.unexpected}: 3}, {${MatchResult.expected}: 2}, "aaa"), 
       expectedTimes: 1, actualTimes: 0
     }, 
     {
       call: 
-      anObject.foo(3, {${MatchResult.was}: "aaa", ${MatchResult.expected}: "bbb"}), 
+      anObject.foo(3, {${MatchResult.unexpected}: "aaa"}, {${MatchResult.expected}: "bbb"}), 
       expectedTimes: 1, actualTimes: 0
     }
   ]

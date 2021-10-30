@@ -117,7 +117,7 @@ The anti-patterns:
 ## Other possibilities
 
  * Type checking of matchers
- * Easier to read if lay out object structure direct;y - pain a picture. Eg comparing a lot of assertThats and one.
+ * Easier to read if lay out object structure directly - pain a picture. Eg comparing a lot of assertThats and one.
 
 # Question
 

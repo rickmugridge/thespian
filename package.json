@@ -1,6 +1,6 @@
 {
   "name": "thespian",
-  "version": "2.8.2",
+  "version": "2.9.0",
   "description": "A mocking framework with a sophisticated approach to argument matching and helpful error messages when arguments fail to match. Written in Typescript and respects types in mocks.",
   "author": {
     "name": "Rick Mugridge",
@@ -27,12 +27,13 @@
     "retest": "mocha --exit \"./dist/src/**/*.micro.js\""
   },
   "devDependencies": {
-    "@types/mocha": "^8.2.1",
-    "@types/node": "~14.14.31",
-    "mismatched": "2.8.2",
-    "mocha": "^8.3.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "~16.11.6",
+    "mismatched": "2.9.0",
+    "mocha": "^9.1.3",
+    "prelude-ts": "1.0.3",
     "rimraf": "^3.0.2",
-    "ts-node": "^9.1.1",
+    "ts-node": "^10.4.0",
     "typescript": "4.2.2"
   }
 }

@@ -1,6 +1,5 @@
 import {Thespian} from "./Thespian";
 import {assertThat, match} from "mismatched";
-import {TMocked} from "./TMocked";
 
 describe("Thespian By Example", () => {
 

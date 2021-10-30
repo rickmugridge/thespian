@@ -15,8 +15,11 @@ describe("Mocked:", () => {
             const {mockUnderTest, mockHandler} = fixture;
             const expected = {
                 fullName: "mockName.f", methodName: "f", successfulCalls: [],
-                expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
-                actualTimes: 0, expectedArgs: {expected: []}, returnFn: match.any()
+                expectedTimesInProgress: {expected: 1, complexity:match.any()},
+                expectedTimes: {expected: 1, complexity:match.any()},
+                actualTimes: 0,
+                expectedArgs: {matchers: [], complexity:match.any()},
+                returnFn: match.any()
             };
             mockHandler
                 .setup(m => m.addCall(expected as any))
@@ -31,8 +34,11 @@ describe("Mocked:", () => {
                 mockHandler.object);
             const expected = {
                 fullName: "mockFnName", methodName: "", successfulCalls: [],
-                expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
-                actualTimes: 0, expectedArgs: {expected: []}, returnFn: match.any()
+                expectedTimesInProgress: {expected: 1, complexity:match.any()},
+                expectedTimes: {expected: 1, complexity:match.any()},
+                actualTimes: 0,
+                expectedArgs: {matchers: [], complexity:match.any()},
+                returnFn: match.any()
             };
             mockHandler
                 .setup(m => m.addCall(expected as any))
@@ -45,8 +51,10 @@ describe("Mocked:", () => {
             const {mockUnderTest, mockHandler} = fixture;
             const expected = {
                 fullName: "mockName.f", methodName: "f", successfulCalls: [],
-                expectedTimesInProgress: {expected: 1}, expectedTimes: {expected: 1},
-                actualTimes: 0, expectedArgs: {expected: []}, returnFn: match.any()
+                expectedTimesInProgress: {expected: 1, complexity:match.any()},
+                expectedTimes: {expected: 1, complexity:match.any()},
+                actualTimes: 0, expectedArgs: {matchers: [], complexity:match.any()},
+                returnFn: match.any()
             };
             mockHandler
                 .setup(m => m.addCall(expected as any))
