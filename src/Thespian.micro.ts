@@ -199,7 +199,7 @@ describe("Thespian()", () => {
         });
 
         it("Mocks are displayed correctly when in mismatched argument list", () => {
-            PrettyPrinter.make(80, 10, Thespian.symbolForMockToString);
+            PrettyPrinter.make(80, 10, 10000, Thespian.symbolForMockToString);
             const thespian = new Thespian();
             const mockI = thespian.mock<I>("i");
             mockI
