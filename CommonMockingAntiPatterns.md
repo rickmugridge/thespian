@@ -1,20 +1,20 @@
 # Nine Common AntiPatterns in JS/TS Mocking Frameworks
 
-# Rick Mugridge, Hypr, 30 March 2021
+# Rick Mugridge, 30 March 2021
 
 I've used a variety of existing mocking frameworks in Typescript development over the last 6 years.
 Most are fine for very simple testing, with simple objects/arrays.
 
-But these all suffered from one or more problems, when mocking or the obejcts concerned get more comples. 
-For example, when:
+But these all suffered from one or more problems, when mocking or when the objects concerned get more complex. 
+For examples, covered further below:
 
- - Several mocks are needed, when test driving a class that plays a coordination role and has several dependencies
+ - Several mocks are needed, when test-driving a class that plays a coordination role and has several dependencies
    injected into that class.
  - A mock call fails with little useful information.
  - The arguments to mocked calls are deeply-nested objects and arrays. And:
     - Some fields/values may be randomly generated, or partially generated, 
       so they need to be ignored or matched in a general way.
-    - If the arguments don't quite match, it takes time to work out the difference
+    - If the arguments don't quite match, it takes time to work out the differences.
   - The argument doesn't quite match and I see the actual result is correct. 
     When the data is complex, I have to copy JSON output and convert it before I can use it in my test.
   - I need the same mocked call with the same arguments to return different results
@@ -48,7 +48,7 @@ The anti-patterns:
    
 ## 2. Matching of call arguments are insufficient (matcher not composable)
 
- - See `Mocking with sophisticated argument matching on calls` in the README for an example.
+ - See `Mocking with sophisticated argument matching on calls` in the [ThespianByExample](ThespianByExample.md) for an example.
  - To get around this limitation, it's necessary to either:
    - Not bother matching the argument at all - treat it as an automatic match.
    - Use a complex predicate to match it, which explicitly walks down the structure and checks it

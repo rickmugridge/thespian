@@ -33,7 +33,7 @@ Thespians are like mocks - they play a role.
       - `mockFn.setup(f => f(100)).returns(() => 20).timesGreater(0);`
 - To access the underlying mock for use in tests:
    - `const check = mockCheck.object;`
- - To verify that all expected mock calls and property accesses have happened:
+ - To verify that all expected mock calls and property accesses have happened (usually in an _afterEach()_):
    - `thespian.verify();`
    
 Mocked methods and function with the same arguments can return a series of results:

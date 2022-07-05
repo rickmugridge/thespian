@@ -19,12 +19,21 @@ import {TMocked} from "thespian";
 import {assertThat} from "mismatched";
 
 describe("Thespian By Example: Undo/Redo", () => {
-    it("Add two commands and undo()", () => {
-        const undoRedo = new UndoManager();
-        const thespian = new Thespian();
-        const edit: TMocked<Command> = thespian.mock<Command>("edit");
-        const replace: TMocked<Command> = thespian.mock<Command>("replace");
+    let thespian: Thespian;
+    let edit: TMocked<Command>;
+    let replace: TMocked<Command>;
+    let undoRedo: UndoManager;
 
+    beforeEach(()=>{
+        thespian = new Thespian();
+        edit = thespian.mock("edit");
+        replace= thespian.mock("replace");
+        undoRedo = new UndoManager();
+    })
+
+    afterEach(()=> thespian.verify());
+
+    it("Add two commands and undo()", () => {
         // Given
         replace
             .setup(f => f.undo())
@@ -51,11 +60,15 @@ interface Command {
 }
 ```
 
-In the example above, we:
+In the _beforeEach()_ in the example above, we:
 
 - Create a `Thespian` object, that is responsible for creating mocks and verifying them afterwards.
 - Create two mocks of the `Command` interface.
   These are actually wrappers for the mock, and allow us to specify how it acts on method calls.
+- Create the object-under-test, the `undoRedo`.
+
+In the test itself:
+
 - Specify what happens when a method call is made on each mock:
     - The `setup()` specifies the method name and any arguments expected in the call.
       In this example, there are no arguments. In general, arbitrary `mismatched` matchers can be used for the arguments.
@@ -69,6 +82,9 @@ In the example above, we:
     - injected as a parameter in a constructor, method, or function.
     - Returned from calls to other mocks.
 - Call the mock's method with matching arguments, and verify that we get the right result.
+
+In the _afterEach()_:
+
 - Verify that all mocks were called as expected (and the right number of times).
 
 ## Mocking with sophisticated argument matching on calls

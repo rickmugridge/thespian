@@ -3,12 +3,21 @@ import {assertThat} from "mismatched";
 import {TMocked} from "./TMocked";
 
 describe("Thespian By Example: Undo/Redo", () => {
-    it("Add two commands and undo()", () => {
-        const undoRedo = new UndoManager();
-        const thespian = new Thespian();
-        const edit: TMocked<Command> = thespian.mock<Command>("edit");
-        const replace: TMocked<Command> = thespian.mock<Command>("replace");
+    let thespian: Thespian;
+    let edit: TMocked<Command>;
+    let replace: TMocked<Command>;
+    let undoRedo: UndoManager;
 
+    beforeEach(()=>{
+        thespian = new Thespian();
+        edit = thespian.mock("edit");
+        replace= thespian.mock("replace");
+        undoRedo = new UndoManager();
+    })
+
+    afterEach(()=> thespian.verify());
+
+    it("Add two commands and undo()", () => {
         // Given
         replace
             .setup(f => f.undo())
