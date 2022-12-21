@@ -80,13 +80,13 @@ describe('MockHandler()', () => {
 
         it("Call known function with a match", () => {
             const fixture = new MockHandlerFixture();
-            const mockedCall = fixture.makeMock(fnName, [1])
+            fixture.makeMock(fnName, [1])
                 .returns(() => 456);
             const fn = fixture.getMock(fnName);
             assertThat(fn(1)).is(456);
             assertThat(fixture.successes()).is([
                 {
-                    call: createPseudoCall("thespian.method", [1]),
+                    call: createPseudoCall("thespian", [1]),
                     returnValue: 456, expectedTimes: 1
                 } as any
             ]);
