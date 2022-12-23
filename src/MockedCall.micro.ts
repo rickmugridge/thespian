@@ -98,7 +98,7 @@ describe("MockedCall()", () => {
             assertThat(successfulCalls).is([]);
         });
 
-        it("Suceeds on first call but not second", () => {
+        it("Succeeds on first call but not second", () => {
             const successfulCalls: Array<SuccessfulCall> = [];
             const mockedCall = new MockedCall("thespian.m", "m", [7], successfulCalls)
                 .returns(f);

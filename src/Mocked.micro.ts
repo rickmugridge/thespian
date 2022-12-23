@@ -15,10 +15,10 @@ describe("Mocked:", () => {
             const {mockUnderTest, mockHandler} = fixture;
             const expected = {
                 fullName: "mockName.f", methodName: "f", successfulCalls: [],
-                expectedTimesInProgress: {expected: 1, complexity:match.any()},
-                expectedTimes: {expected: 1, complexity:match.any()},
+                expectedTimesInProgress: {expected: 1, specificity: match.any()},
+                expectedTimes: {expected: 1, specificity: match.any()},
                 actualTimes: 0,
-                expectedArgs: {matchers: [], complexity:match.any()},
+                expectedArgs: {elementMatchers: [], specificity: match.any()},
                 returnFn: match.any()
             };
             mockHandler
@@ -34,10 +34,10 @@ describe("Mocked:", () => {
                 mockHandler.object);
             const expected = {
                 fullName: "mockFnName", methodName: "", successfulCalls: [],
-                expectedTimesInProgress: {expected: 1, complexity:match.any()},
-                expectedTimes: {expected: 1, complexity:match.any()},
+                expectedTimesInProgress: {expected: 1, specificity: match.any()},
+                expectedTimes: {expected: 1, specificity: match.any()},
                 actualTimes: 0,
-                expectedArgs: {matchers: [], complexity:match.any()},
+                expectedArgs: {elementMatchers: [], specificity: match.any()},
                 returnFn: match.any()
             };
             mockHandler
@@ -51,9 +51,9 @@ describe("Mocked:", () => {
             const {mockUnderTest, mockHandler} = fixture;
             const expected = {
                 fullName: "mockName.f", methodName: "f", successfulCalls: [],
-                expectedTimesInProgress: {expected: 1, complexity:match.any()},
-                expectedTimes: {expected: 1, complexity:match.any()},
-                actualTimes: 0, expectedArgs: {matchers: [], complexity:match.any()},
+                expectedTimesInProgress: {expected: 1, specificity: match.any()},
+                expectedTimes: {expected: 1, specificity: match.any()},
+                actualTimes: 0, expectedArgs: {elementMatchers: [], specificity: match.any()},
                 returnFn: match.any()
             };
             mockHandler
