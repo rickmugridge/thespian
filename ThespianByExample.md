@@ -49,7 +49,6 @@ describe("Thespian By Example: Undo/Redo", () => {
 
         // Then
         assertThat(undoRedo.currentDetails()).is("Edit");
-        thespian.verify();
     });
 });
 
@@ -67,6 +66,11 @@ In the _beforeEach()_ in the example above, we:
   These are actually wrappers for the mock, and allow us to specify how it acts on method calls.
 - Create the object-under-test, the `undoRedo`.
 
+In the _afterEach()_ in the example above, we:
+
+- Call `verify() on the `Thespian` object. 
+  This checks that all mocked methods, etc have been called the correct number of times (1 by default)
+
 In the test itself:
 
 - Specify what happens when a method call is made on each mock:
@@ -82,10 +86,6 @@ In the test itself:
     - injected as a parameter in a constructor, method, or function.
     - Returned from calls to other mocks.
 - Call the mock's method with matching arguments, and verify that we get the right result.
-
-In the _afterEach()_:
-
-- Verify that all mocks were called as expected (and the right number of times).
 
 ## Mocking with sophisticated argument matching on calls
 
@@ -124,7 +124,6 @@ Here's an example which involves nested object, where we match on the argument p
                 links: ["REL"]
             }]
         })).is(match.ofType.number());
-        thespian.verify();
     });
 ```
 
@@ -158,7 +157,6 @@ Any mocked calls that have already been passed are also shown.
         const mocked = mock.object;
         assertThat(mocked.tellAll("elisa", 2)).is(44);
         assertThat(mocked.tellAll("elisa", 2)).is(44);
-        thespian.verify();
     });
 ```
 
@@ -200,7 +198,6 @@ Here's an example of a property access being mocked.
                 .setup(f => f.prop)
                 .returns(() => 44);
             assertThat(mock.object.prop).is(44);
-            thespian.verify();
         });
 ```
 
@@ -218,6 +215,5 @@ Here's an example of a function being mocked.
         thespian.describeMocks();
         assertThat(mockFn.object(2)).is(33);
         thespian.describeMocks();
-        thespian.verify();
     });
 ```

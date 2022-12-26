@@ -8,14 +8,14 @@ describe("Thespian By Example: Undo/Redo", () => {
     let replace: TMocked<Command>;
     let undoRedo: UndoManager;
 
-    beforeEach(()=>{
+    beforeEach(() => {
         thespian = new Thespian();
         edit = thespian.mock("edit");
-        replace= thespian.mock("replace");
+        replace = thespian.mock("replace");
         undoRedo = new UndoManager();
     })
 
-    afterEach(()=> thespian.verify());
+    afterEach(()=> thespian.verify())
 
     it("Add two commands and undo()", () => {
         // Given
@@ -33,7 +33,6 @@ describe("Thespian By Example: Undo/Redo", () => {
 
         // Then
         assertThat(undoRedo.currentDetails()).is("Edit");
-        thespian.verify();
     });
 });
 
