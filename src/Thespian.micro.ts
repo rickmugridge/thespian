@@ -212,6 +212,7 @@ describe("Thespian()", () => {
                 .setup(g => (g as any).ga(j))
                 .returns(arg => arg);
             assertThat(() => j.ga(i)).throws(new Error(`{problem: "Unable to handle call, as none match", mockCall: j.ga({mock: "i"})}`))
+            // thespian.verify(); Can't verify as we're testing messages from the failure
         });
     });
 
