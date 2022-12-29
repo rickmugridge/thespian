@@ -69,4 +69,6 @@ Here's an example, where there are two near misses:
  * See [Thespian By Example](ThespianByExample.md)
  * See [Thespian Design Decisions](DesignDecisions.md)
  * See [Common Mocking Anti-Patterns](CommonMockingAntiPatterns.md)
+ * See [Lazy vs Eager Verification of Mocks](LazyOrEagerVerificationOfMocks.md)
+ * See [Mocks and Exception Handling in Tested Code](MocksAndExceptionHandling.md)
     

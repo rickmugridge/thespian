@@ -21,10 +21,7 @@ There are two main approaches to verifying mocks:
     * After the system-under-test has finished, check that the mocks have been called the correct number of times.
     * This is the approach that `thespian` and `JMock2` (Java) use, and is a configurable option with `TypeMoq`.
 
-There are disadvantages with these approaches when:
-
-* Mock call fails (Lazy only)
-* Mock call fails and there are try-catches in the system-under-test code
+There are disadvantages with the Lazy approaches when mock calls fail.
 
 ## Mock call fails
 
@@ -37,7 +34,7 @@ This can have two consequences:
   along.
   This can lead to a faulty result returned, spurious exceptions and/or error messages, or extra failed verifications.
   These make it difficult to understand why the test failed (and especially when there are multiple mocks in use).
-* If `undefined` is a normally-valid response, the code path of the system-under-test code may be unexpectedly altered.
+* If `undefined` is a normally-valid response, the execution path of the system-under-test code may be unexpectedly altered.
   This may mean that the verification outcomes for the mocks are harder to understand.
 
 Eg, Consider the following trivial system-user-test code:
@@ -78,7 +75,7 @@ where the functions `e` also accepts an `undefined` value argument.
 In this case, if either the `f` or `g` mock setups fail to match, an `undefined` value will be passed to the `e` function.
 This, presumably, will return a valid boolean value. Depending on that resulting value, either:
 
-  1. The test partially passes, even though a mock call failed to match.
+  1. The test assertion passes, even though a mock call failed to match.
   2. The test fails.
 
 In either case, we can only tell what went wrong by carefully reading the results of the post-run verification of the mocks.
@@ -91,20 +88,8 @@ In the Eager approach, if a mock call from the system-under-test is not matched,
 with an error.
 This makes it easy to **immediately** see where the test is inconsistent with the code being tested.
 
-## Mock call fails and there are try-catches in the system-under-test code
+With `thespian`, we also:
 
-Consider when a mock fails to match and activates a try-catch in the system-under-test code:
-
-* Lazy approach: When `undefined` is not a normally-valid response, an exception may be thrown.
-* Eager approach: An exception is thrown when a mock call fails to match.
-
-Regardless of the reason for the exception, we will have a problem if the try-catch swallows it or otherwise acts
-incorrectly.
-
-Here are two possible approaches to avoid this problem:
-
-* Separate the try-catch part into a separate method/function.
-    * Test the part without the try-catch in some tests, checking the other logic.
-    * Test the try-catch part specifically, where any mock calls explicitly throw exceptions.
-* Ensure that the try-catch logic in the system-under-test code explicitly fails when unknown `Errors` are thrown.
-  This may not be possible, or it may unduely obscure the application code.
+  * Log what specific mock calls had been made prior to the failing one
+  * When a call doesn't quite match the arguments in the mock call setup, `thespian` uses `mismatched` to show the differences.
+    This make it easier when arguments are complex arrays/objects.

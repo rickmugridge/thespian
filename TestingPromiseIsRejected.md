@@ -4,7 +4,7 @@ There are some traps in trying to verify that a function or method has rejected 
 
 For a simple example, consider that we want to test the following function:
 
-```
+```typescript
 function handleError(id: number, repo: Repo, handler: Handler): Promise<string> {
     return repo
         .get(id)
@@ -35,7 +35,7 @@ So it looks like we've tested it, but we haven't. The test passes.
 
 One way to handle this is as follows:
 
-```
+```typescript
            return handleError(44, repo.object, handler.object)
                 .then(() => fail(), () => thespian.verify());
 ```
@@ -45,7 +45,7 @@ This will then result in a failed test.
 
 `mistmatched` provided a clean way of testing such cases:
 
-```
+```typescript
            return assertThat(handleError(44, repo.object, handler.object))
                 .catches("whoops")
                 .then(()=> thespian.verify());

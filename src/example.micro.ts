@@ -58,12 +58,30 @@ describe("Thespian By Example", () => {
     });
 
     it("mocking a function", () => {
-        let mockFn = thespian.mock<(i: number) => number>("fn");
+        const mockFn = thespian.mock<(i: number) => number>("fn");
         mockFn
             .setup(g => g(2))
             .returns(() => 33);
         thespian.describeMocks();
         assertThat(mockFn.object(2)).is(33);
         thespian.describeMocks();
+    });
+
+    xit("eg22", () => {
+        const fun = (g: (a: number) => number, h: (b: number) => number, a: number): number => {
+            try {
+                return g(h(a))
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        const mockG = thespian.mock<(a: number) => number>("g");
+        mockG.setup(g => g(12)).returns(() => 30)
+        const mockH = thespian.mock<(a: number) => number>("h");
+        mockH.setup(g => g(12)).returns(() => 30)
+
+        assertThat(fun(mockG.object, mockH.object, 4)).is(0)
+
     });
 });

@@ -13,7 +13,7 @@ We mock the `Commands` so we verify that `UndoManager` operates correctly:
 
 The use of `thespian` is further explained below the example.
 
-```
+```typescript
 import {Thespian} from "thespian";
 import {TMocked} from "thespian";
 import {assertThat} from "mismatched";
@@ -91,7 +91,7 @@ In the test itself:
 
 Here's an example which involves nested object, where we match on the argument passed to the mock.
 
-```
+```typescript
     it("Sophisticated matching of mock arguments", () => {
         interface Matched {
             matchId: number;
@@ -142,7 +142,7 @@ Any mocked calls that have already been passed are also shown.
 
 ## Mocking a Method that can be called several times
 
-```
+```typescript
     interface Tell {
         tellAll(user: string, count: number): number
     }
@@ -190,7 +190,7 @@ This shows that 2 calls were expected but only one was received.
 
 Here's an example of a property access being mocked.
 
-```
+```typescript
        it("property accessed once", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
@@ -205,7 +205,7 @@ Here's an example of a property access being mocked.
 
 Here's an example of a function being mocked.
 
-```
+```typescript
     it("mocking a function", () => {
         let thespian = new Thespian();
         let mockFn = thespian.mock<(i: number) => number>("fn");
