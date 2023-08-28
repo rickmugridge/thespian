@@ -9,7 +9,7 @@ a sophisticated composable matcher for matching arguments of method and function
 
 Thespians are like mocks - they play a role.
 
-# Short Docs
+# Short Docs:
 
  - To create a `Thespian` in order to create mocks:
    - `const thespian = new Thespian();`
