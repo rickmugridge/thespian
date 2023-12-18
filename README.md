@@ -11,6 +11,8 @@ Thespians are like mocks - they play a role.
 
 See [Thespian By Example](ThespianByExample.md)
 
+See [What is New](WhatIsNew.md)
+
 # Short Docs:
 
 - To create a `Thespian` in order to create mocks:
