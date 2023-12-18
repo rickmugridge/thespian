@@ -13,6 +13,38 @@ describe("Thespian()", () => {
             thespian.verify();
         });
 
+        it("method called once throws an Error exception (using returns())", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("an object");
+            mock
+                .setup(f => f.foo(2, match.ofType.string()))
+                .returns(() => {
+                    throw new Error("failed")
+                });
+            assertThat(() => mock.object.foo(2, "aaa")).throwsError("failed");
+            thespian.verify();
+        });
+
+        it("method called once throws an Error exception", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("an object");
+            mock
+                .setup(f => f.foo(2, match.ofType.string()))
+                .throws(new Error("failed"));
+            assertThat(() => mock.object.foo(2, "aaa")).throwsError("failed");
+            thespian.verify();
+        });
+
+        it("method called once throws a non-Error exception", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("an object");
+            mock
+                .setup(f => f.foo(2, match.ofType.string()))
+                .throws("failed");
+            assertThat(() => mock.object.foo(2, "aaa")).throws("failed");
+            thespian.verify();
+        });
+
         it("a method called twice with same arguments and same result", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("an object");
@@ -227,6 +259,38 @@ describe("Thespian()", () => {
             thespian.verify();
         });
 
+        it("function called once that throws an Error exception", () => {
+            let thespian = new Thespian();
+            let mock = thespian.mock<(i: number) => number>("fn");
+            mock
+                .setup(g => g(2))
+                .throws(new Error("failed"));
+            assertThat(() => mock.object(2)).throwsError("failed");
+            thespian.verify();
+        });
+
+        it("function called once that throws an Error exception (via returns())", () => {
+            let thespian = new Thespian();
+            let mock = thespian.mock<(i: number) => number>("fn");
+            mock
+                .setup(g => g(2))
+                .returns(() => {
+                    throw new Error("failed")
+                });
+            assertThat(() => mock.object(2)).throwsError("failed");
+            thespian.verify();
+        });
+
+        it("function called once that throws a non-Error exception", () => {
+            let thespian = new Thespian();
+            let mock = thespian.mock<(i: number) => number>("fn");
+            mock
+                .setup(g => g(2))
+                .throws("failed");
+            assertThat(() => mock.object(2)).throws("failed");
+            thespian.verify();
+        });
+
         it("function called twice with same arguments and same result", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<(i: number) => number>("fn");
@@ -300,6 +364,28 @@ describe("Thespian()", () => {
                 .setup(f => f.prop)
                 .returns(() => 44);
             assertThat(mock.object.prop).is(44);
+            thespian.verify();
+        });
+
+        it("property access results in exception", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .throws(new Error("failed"));
+            assertThat(() => mock.object.prop).throwsError("failed");
+            thespian.verify();
+        });
+
+        it("property access results in exception (via returns)", () => {
+            const thespian = new Thespian();
+            const mock = thespian.mock<I>("anObject");
+            mock
+                .setup(f => f.prop)
+                .returns(() => {
+                    throw new Error("failed")
+                });
+            assertThat(() => mock.object.prop).throwsError("failed");
             thespian.verify();
         });
 

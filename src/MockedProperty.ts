@@ -8,6 +8,7 @@ export class MockedProperty<U> { // where U is the property type
     private expectedTimes = match.isEquals(1) as DiffMatcher<any>;
     private actualTimes = 0;
     private returnFn: () => U;
+    private throwsError?: any = undefined;
 
     constructor(public fullName: string,
                 public propertyName: string,
@@ -21,6 +22,11 @@ export class MockedProperty<U> { // where U is the property type
 
     returnsVoid(): this {
         throw new Error("An object property needs to return some value");
+    }
+
+    throws(error: any): this {
+        this.throwsError = error;
+        return this;
     }
 
     times(count: number): this {
@@ -44,11 +50,22 @@ export class MockedProperty<U> { // where U is the property type
     access(): AccessResult {
         const timesCorrect = this.expectedTimesInProgress.matches(this.actualTimes + 1).passed();
         if (timesCorrect) {
-            const result = this.returnFn();
             this.actualTimes += 1;
-            this.successfulCalls.push(SuccessfulCall.ofProperty(this.fullName, result,
-                this.expectedTimes.describe()));
-            return {result};
+            if (this.throwsError) {
+                this.successfulCalls.push(SuccessfulCall.ofProperty(this.fullName,
+                    this.throwsError, this.expectedTimes.describe()));
+                throw this.throwsError;
+            }
+            try {
+                const result = this.returnFn();
+                this.successfulCalls.push(SuccessfulCall.ofProperty(this.fullName, result,
+                    this.expectedTimes.describe()));
+                return {result};
+            } catch (e) {
+                this.successfulCalls.push(SuccessfulCall.ofProperty(this.fullName,
+                    e, this.expectedTimes.describe()));
+                throw e;
+            }
         }
         const failed = UnsuccessfulAccess.make(this.fullName, this.expectedTimes.describe(),
             this.actualTimes + 1);
@@ -64,7 +81,7 @@ export class MockedProperty<U> { // where U is the property type
     }
 
     describe() {
-        return UnsuccessfulAccess.make(this.fullName, 0, this.actualTimes).describe();
+        return UnsuccessfulAccess.make(this.fullName, this.expectedTimes.describe(), this.actualTimes).describe();
     }
 }
 

@@ -8,7 +8,7 @@ export class UnsuccessfulCall {
                         public actualTimes: number) {
     }
 
-    describe() {
+    describe(): any {
         return {call: this.call, expectedTimes: this.expectedTimes, actualTimes: this.actualTimes};
     }
 
@@ -20,7 +20,7 @@ export class UnsuccessfulCall {
                 matchRate: number,
                 expectedArgs: any,
                 expectedTimes: any,
-                actualTimes: number) {
+                actualTimes: number): UnsuccessfulCall {
         return new UnsuccessfulCall(createPseudoCall(name, expectedArgs),
             matchRate, expectedTimes, actualTimes);
     }
@@ -28,7 +28,7 @@ export class UnsuccessfulCall {
     static makeNearMiss(name: string,
                         matchResult: MatchResult,
                         expectedTimes: any,
-                        actualTimes: number) {
+                        actualTimes: number): UnsuccessfulCall {
         return new UnsuccessfulCall(createPseudoCall(name, matchResult.diff as Array<any>), matchResult.matchRate,
             expectedTimes, actualTimes);
     }

@@ -1,6 +1,5 @@
 import {DiffMatcher} from "mismatched/dist/src/matcher/DiffMatcher";
 import {match, MatchResult} from "mismatched";
-import {Thespian} from "./Thespian";
 import {SuccessfulCall} from "./SuccessfulCall";
 import {UnsuccessfulCall} from "./UnsuccessfulCall";
 import {matchMaker} from "mismatched/dist/src/matchMaker/matchMaker";
@@ -25,6 +24,11 @@ export class MockedCall<U> { // where U is the return type
     }
 
     returnsVoid(): this {
+        return this;
+    }
+
+    throws(error: any): this {
+        this.throwsError = error;
         return this;
     }
 
@@ -58,17 +62,20 @@ export class MockedCall<U> { // where U is the return type
                 this.expectedTimes.describe(), this.actualTimes + 1);
             return {failed};
         }
+        this.actualTimes += 1;
+        if (this.throwsError) {
+            this.successfulCalls.push(SuccessfulCall.ofCall(this.fullName,
+                actualArgs, this.throwsError, this.expectedTimes.describe()));
+            throw this.throwsError;
+        }
         try {
             const result = this.returnFn.apply(undefined, actualArgs);
-            this.actualTimes += 1;
             this.successfulCalls.push(SuccessfulCall.ofCall(this.fullName,
                 actualArgs, result, this.expectedTimes.describe()));
             return {result};
         } catch (e) {
-            Thespian.printer.logToConsole({
-                mockedReturn: this.fullName + '.' + this.methodName,
-                failed: e.message || e,
-            });
+            this.successfulCalls.push(SuccessfulCall.ofCall(this.fullName,
+                actualArgs, e, this.expectedTimes.describe()));
             throw e;
         }
     }
@@ -88,12 +95,13 @@ export class MockedCall<U> { // where U is the return type
         return this.expectedTimes.matches(this.actualTimes).passed();
     }
 
-    describe() {
+    describe(): any {
         return UnsuccessfulCall.make(this.fullName, 0,
             this.expectedArgs.describe(), this.expectedTimes.describe(), this.actualTimes).describe();
     }
 
     private returnFn: (...args: Array<any>) => U = () => undefined as any as U;
+    private throwsError?: any = undefined;
 }
 
 export interface RunResult {

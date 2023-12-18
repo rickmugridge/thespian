@@ -26,6 +26,6 @@ export class SuccessfulCall {
     }
 }
 
-export function createPseudoCall(name: string, args?: Array<any>) {
+export function createPseudoCall(name: string, args?: Array<any>): object {
     return {[PrettyPrinter.symbolForPseudoCall]: name, args};
 }
