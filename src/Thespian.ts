@@ -9,8 +9,7 @@ import {generateValidator} from "./generate/generateValidator";
 let mockCount = 1;
 
 export class Thespian {
-    public static symbolForMockToString = Symbol("symbolForMockToString");
-    public static printer = PrettyPrinter.make(80, 20, 10000, Thespian.symbolForMockToString);
+    public static printer = PrettyPrinter.make();
     private mocks: Array<Mocked<any>> = []; // One for each Mocked object or function
     private successfulCalls: Array<SuccessfulCall> = [];
 

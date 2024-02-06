@@ -1,9 +1,15 @@
 import {Mocked} from "./Mocked";
-import {assertThat, match} from "mismatched";
+import {assertThat, match, PrettyPrinter} from "mismatched";
 import {MockFixture} from "./MockFixture";
+import {MockHandler} from "./MockHandler"
 
 describe("Mocked:", () => {
     describe("setUp():", () => {
+        it("experiment with Proxy", () => {
+            const proxy = new Proxy(() => 3,
+                new MockHandler("mockName", []))
+            assertThat(Object.keys(proxy)).is(["name"])
+        })
         it("Expects a lambda", () => {
             const fixture = new MockFixture();
             assertThat(() => fixture.mockUnderTest.setup(4 as any))

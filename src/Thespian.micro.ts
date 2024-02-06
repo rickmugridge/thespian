@@ -231,19 +231,28 @@ describe("Thespian()", () => {
         });
 
         it("Mocks are displayed correctly when in mismatched argument list", () => {
-            PrettyPrinter.make(80, 10, 10000, Thespian.symbolForMockToString);
             const thespian = new Thespian();
             const mockI = thespian.mock<I>("i");
             mockI
                 .setup(g => g.foo(2, "a"))
                 .returns(() => 33);
             const i = mockI.object;
-            const mockJ = thespian.mock<J>("j");
-            const j = mockJ.object;
-            mockJ
-                .setup(g => (g as any).ga(j))
-                .returns(arg => arg);
-            assertThat(() => j.ga(i)).throws(new Error(`{problem: "Unable to handle call, as none match", mockCall: j.ga({mock: "i"})}`))
+            const message = match.string.includes('mockCall: i.foo({mock: "i"}, "a")')
+            assertThat(() => i.foo(i as any, "a")).throwsError(message)
+            // thespian.verify(); Can't verify as we're testing messages from the failure
+        });
+
+        it("Can test a mock against itself", () => {
+            const thespian = new Thespian();
+            const mockI = thespian.mock<I>("i");
+            mockI
+                .setup(g => g.foo(2, "a"))
+                .returns(() => 33);
+            const i = mockI.object;
+
+            assertThat(i).is(i)
+            assertThat(0).isNot(i as any)
+            assertThat(i).isNot(0 as any)
             // thespian.verify(); Can't verify as we're testing messages from the failure
         });
     });

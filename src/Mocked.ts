@@ -7,7 +7,7 @@ import {DefinedSetUp, SetUpDetails, SetUpType} from "./DefinedSetUp";
 import {MockedProperty} from "./MockedProperty";
 import {matchMaker} from "mismatched/dist/src/matchMaker/matchMaker";
 
-let expectedArgs;
+let expectedArgs; // Used to determine arguments in a setup.
 
 export class Mocked<T> implements TMocked<T> { // One for each mocked object and function
     public object: any; // Access the underlying mock.
@@ -59,7 +59,8 @@ export class Mocked<T> implements TMocked<T> { // One for each mocked object and
     }
 
     private addMockedCall<U>(fullName: string, fieldName: string): MockedCall<U> {
-        const mockCall = new MockedCall<U>(fullName, fieldName, expectedArgs.map(matchMaker), this.successfulCalls);
+        const mockCall = new MockedCall<U>(fullName, fieldName,
+            expectedArgs.map(matchMaker), this.successfulCalls);
         this.handler.addCall(mockCall);
         return mockCall;
     }

@@ -4,6 +4,7 @@ import {match} from "mismatched/dist/src/match";
 import {MockHandlerFixture} from "./MockHandlerFixture";
 import {Thespian} from "./Thespian";
 import {createPseudoCall} from "./SuccessfulCall";
+import {PrettyPrinter} from "mismatched"
 
 const methodName = "method";
 const fnName = "";
@@ -97,7 +98,7 @@ describe('MockHandler()', () => {
         const fixture = new MockHandlerFixture();
         fixture.makeMock(methodName, [1])
             .returns(() => 5);
-        const fn = fixture.getMock(Thespian.symbolForMockToString);
+        const fn = fixture.getMock(PrettyPrinter.symbolForMockName);
         assertThat(fn()).is("thespian");
     });
 });

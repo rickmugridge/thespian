@@ -112,7 +112,7 @@ describe("MockedCall()", () => {
             assertThat(result.failed).isNot(undefined);
             assertThat(PrettyPrinter.make().render(result)).is(`{
   failed: {
-    call: thespian.m({${[MatchResult.expected]}: 5}), matchRate: 0, expectedTimes: 1, 
+    call: thespian.m({${[MatchResult.expected]}: 5}), matchRate: 0.05, expectedTimes: 1, 
     actualTimes: 0
   }
 }`);

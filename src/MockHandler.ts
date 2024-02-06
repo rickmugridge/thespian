@@ -37,7 +37,7 @@ export class MockHandler implements ProxyHandler<{}> {
 
     get(target, propKey: string | number | symbol, receiver): any { // actually a "(...) => any" for methods and functions
         const self = this;
-        if (propKey === Thespian.symbolForMockToString) {
+        if (propKey === PrettyPrinter.symbolForMockName) {
             return () => self.mockName;
         }
         if (ofType.isSymbol(propKey) || propKey === "inspect" || propKey === "name") {
