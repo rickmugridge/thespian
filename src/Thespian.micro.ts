@@ -1,5 +1,5 @@
 import {Thespian} from "./Thespian";
-import {assertThat, match, MatchResult, PrettyPrinter} from "mismatched";
+import {assertThat, match, MatchResult} from "mismatched";
 
 describe("Thespian()", () => {
     describe("object", () => {
@@ -131,7 +131,7 @@ describe("Thespian()", () => {
   nearMisses: [
     {
       call: 
-      anObject.foo({${MatchResult.unexpected}: 4}, {${MatchResult.expected}: 2}, "aaa"), 
+      anObject.foo({${MatchResult.unexpected}: 4}, "aaa", {${MatchResult.expected}: 2}), 
       expectedTimes: 1, actualTimes: 0
     }
   ]
@@ -191,7 +191,7 @@ describe("Thespian()", () => {
     {call: anObject.foo(2, "aaa"), expectedTimes: 1, actualTimes: 2}, 
     {
       call: 
-      anObject.foo({${MatchResult.unexpected}: 2}, {${MatchResult.expected}: 3}, "aaa"), 
+      anObject.foo({${MatchResult.unexpected}: 2}, "aaa", {${MatchResult.expected}: 3}), 
       expectedTimes: 1, actualTimes: 0
     }
   ], 
@@ -217,7 +217,7 @@ describe("Thespian()", () => {
   nearMisses: [
     {
       call: 
-      anObject.foo({${MatchResult.unexpected}: 3}, {${MatchResult.expected}: 2}, "aaa"), 
+      anObject.foo({${MatchResult.unexpected}: 3}, "aaa", {${MatchResult.expected}: 2}), 
       expectedTimes: 1, actualTimes: 0
     }, 
     {
