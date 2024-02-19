@@ -62,6 +62,10 @@ export class MockHandler implements ProxyHandler<{}> {
         if (this.mapMethodToMockCalls.has(propKey)) {
             return returnedFn;
         }
+
+        if (propKey === "then") {
+            return () => undefined
+        }
         // Unfortunately, we can't return the function to get the real args because it may be a property access:
         return mismatchedFn();
     }

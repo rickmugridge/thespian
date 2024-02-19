@@ -48,11 +48,14 @@ The `.returns()` part can cause those side-effects:
 
 ## "I am returning a mock so it ends up being used in a Promise chain.
 
-Even though it is not a Promise, it fails when its `.then()` is checked.
-How can I avoid the failure?"
+The behaviour of thespian was changed on 20 Feb 24. It is now automatically treated as not being a Promise (unless you want it be treated that way). 
+Now, an access to the property `then` returns `() => undefined` if and only if there is no setup for that property.
 
-- Simply define a mock on its `then` property to return `undefined` (any number of times):
-- `mockObj.setup(m => b.then).returns(()=> undefined).timesAtLeast(0);`
+~~Even though it is not a Promise, it fails when its `.then()` is checked.
+How can I avoid the failure?"~~
+
+- ~~Simply define a mock on its `then` property to return `undefined` (any number of times):~~
+- ~~`mockObj.setup(m => b.then).returns(()=> undefined).timesAtLeast(0);`~~
 
 ## I am returning a mock that's later checked against itself. Can I do that?
 

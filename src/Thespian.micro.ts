@@ -366,6 +366,21 @@ describe("Thespian()", () => {
     });
 
     describe("property", () => {
+        it("property then is handled specially: returns a () => undefined", () => {
+            const thespian = new Thespian()
+            const mock = thespian.mock<I>("anObject")
+            assertThat(mock.object["then"]()).is(undefined)
+            // In the following, the then() part will not be executed
+            let called = false
+            const promise = (mock.object as any).then(() => {
+                called = true
+                Promise.resolve(true)
+            })
+            assertThat(promise).is(undefined)
+            assertThat(called).is(false)
+            thespian.verify()
+        });
+
         it("property accessed once", () => {
             const thespian = new Thespian();
             const mock = thespian.mock<I>("anObject");
