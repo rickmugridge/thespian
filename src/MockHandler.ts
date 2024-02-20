@@ -64,7 +64,7 @@ export class MockHandler implements ProxyHandler<{}> {
         }
 
         if (propKey === "then") {
-            return () => undefined
+            return undefined
         }
         // Unfortunately, we can't return the function to get the real args because it may be a property access:
         return mismatchedFn();
