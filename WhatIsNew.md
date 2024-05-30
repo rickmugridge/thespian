@@ -1,4 +1,4 @@
-# What is New (since Dec 2023)
+# What is New (since Dec 2023, excluding updates due to mismatched updates)
 
 ## 20 February 2024
 
