@@ -1,4 +1,4 @@
-import {SyntaxKind, TypeNode} from "typescript";
+import {NodeArray, SyntaxKind, TypeNode, TypeParameterDeclaration} from "typescript";
 import {ofType} from "mismatched/dist/src/ofType";
 import {
     TArray,
@@ -86,7 +86,7 @@ const handleTypeReference = (type: any,
 const mapElements = (elements: any[],
                      elementaryClassSet: Set<string>,
                      enumMap: Map<string, string>): TType[] =>
-    elements.filter(e => ofType.isObject(e)).map(e => getCompiledType(e, elementaryClassSet, enumMap))
+    elements.filter(e => ofType.isObject(e)).map(e => getCompiledType(e as TypeNode, elementaryClassSet, enumMap))
 
 const mapParameters = (parameters: any[],
                        elementaryClassSet: Set<string>,
@@ -98,5 +98,5 @@ export const mapGenericArguments = (typeArguments: any[],
                                     enumMap: Map<string, string>) =>
     mapElements(typeArguments || [], elementaryClassSet, enumMap).map(t => new TGenericArgument(t))
 
-export const mapGenericParameters = (typeParameters?: any[]) =>
+export const mapGenericParameters = (typeParameters?: NodeArray<TypeParameterDeclaration>) =>
     (typeParameters || []).filter(e => ofType.isObject(e)).map(t => new TGenericParameter(getName(t.name)))

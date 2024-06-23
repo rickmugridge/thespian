@@ -26,7 +26,7 @@ const getCompiledClass = (node: ts.ClassDeclaration,
                           elementaryClassSet: Set<string>,
                           enumMap: Map<string, string>) => {
     const name = getName(node.name)
-    const genericParameters = mapGenericParameters(node.typeParameters as any)
+    const genericParameters = mapGenericParameters(node.typeParameters)
     node.members.forEach(member => {
         if (ts.isConstructorDeclaration(member)) {
             decompiledArray.push({
