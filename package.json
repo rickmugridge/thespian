@@ -1,10 +1,10 @@
 {
   "name": "thespian",
-  "version": "3.3.5",
+  "version": "4.0.1",
   "description": "A mocking framework with a sophisticated approach to argument matching and helpful error messages when arguments fail to match. Written in Typescript and respects types in mocks.",
   "author": {
     "name": "Rick Mugridge",
-    "email": "rick.mugridge@hypr.co.nz"
+    "email": "rick.mugridge.gmail.com"
   },
   "keywords": [
     "mock"
@@ -34,7 +34,7 @@
     "typescript": "5.5.2"
   },
   "dependencies": {
-    "mismatched": "3.3.5",
+    "mismatched": "4.0.1",
     "prelude-ts": "1.0.6"
   }
 }
